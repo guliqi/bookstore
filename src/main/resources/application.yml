@@ -1,0 +1,22 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: glq123Ab
+    url: jdbc:mysql://127.0.0.1:3306/JavaEE
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: -1
+        max-idle: 500
+        max-wait: -1s
+mybatis:
+  mapper-locations: classpath*:mappers/*Mapper.xml
+  type-aliases-package: com.guliqi.bookstore.model
+  configuration:
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
