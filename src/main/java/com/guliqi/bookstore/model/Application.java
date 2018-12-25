@@ -1,27 +1,33 @@
 package com.guliqi.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.*;
 
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@JsonIgnoreProperties(value = {"handler", "user"})
+@AllArgsConstructor
+@JsonIgnoreProperties(value = {"handler"})
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class Application implements Serializable {
+
+    @JsonView(Views.WithoutUserView.class)
     private String application_id;
-
+    @JsonView(Views.WithUserView.class)
     private User user;
-
+    @JsonView(Views.WithoutUserView.class)
     private String storename;
-
+    @JsonView(Views.WithoutUserView.class)
     private Address address;
-
+    @JsonView(Views.WithoutUserView.class)
     private String bank_card;
-
+    @JsonView(Views.WithoutUserView.class)
     private String state;
-
+    @JsonView(Views.WithoutUserView.class)
     private String introduction;
 
     private String admin;

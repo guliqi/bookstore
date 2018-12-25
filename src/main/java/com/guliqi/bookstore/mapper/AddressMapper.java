@@ -42,12 +42,18 @@ public interface AddressMapper {
     })
     Address selectById(String address_id);
 
+//    @Select({"select * from Address where user_id = #{user_id,jdbcType=VARCHAR}"})
+//    @Results({
+//            @Result(column = "address_id", property = "address_id", jdbcType=JdbcType.VARCHAR, id = true),
+//            @Result(column = "user_id", property = "user", jdbcType=JdbcType.VARCHAR,
+//                    one = @One(select = "com.guliqi.bookstore.mapper.UserMapper.selectById",
+//                            fetchType = FetchType.EAGER))
+//    })
+//    Set<Address> selectByUserId(String user_id);
+
     @Select({"select * from Address where user_id = #{user_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column = "address_id", property = "address_id", jdbcType=JdbcType.VARCHAR, id = true),
-            @Result(column = "user_id", property = "user", jdbcType=JdbcType.VARCHAR,
-                    one = @One(select = "com.guliqi.bookstore.mapper.UserMapper.selectById",
-                            fetchType = FetchType.EAGER))
     })
     Set<Address> selectByUserId(String user_id);
 }

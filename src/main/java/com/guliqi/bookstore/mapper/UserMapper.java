@@ -38,10 +38,24 @@ public interface UserMapper {
     })
     int insert(User record);
 
+    // 返回 phone, gender, nickname
     @Select({"select phone, gender, nickname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     User simpleSelectById(String user_id);
 
-    @Select({"select * from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    // 返回 phone, gender, nickname, idcard, realname
+    @Select({"select phone, gender, nickname, idcard, realname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    User detailSelectById(String user_id);
+
+    // 返回 user_id, password
+    @Select({"select user_id, password from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    @Results({
+            @Result(column="user_id", property="user_id", jdbcType=JdbcType.VARCHAR, id=true),
+    })
+    User selectPwdById(String user_id);
+
+    // 返回 user_id, phone, gender, nickname, idcard, realname
+    // 懒加载 store, order, shoppinglist, address, application
+    @Select({"select user_id, phone, gender, nickname, idcard, realname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="user_id", property="user_id", jdbcType=JdbcType.VARCHAR, id=true),
             @Result(column="IDcard", property="idcard", jdbcType=JdbcType.VARCHAR),

@@ -1,6 +1,7 @@
 package com.guliqi.bookstore.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.guliqi.bookstore.Constants;
 import com.guliqi.bookstore.mapper.UserMapper;
 import com.guliqi.bookstore.model.User;
 import com.guliqi.bookstore.utils.CommonUtil;
@@ -47,6 +48,36 @@ public class UserService {
             user.setUser_id(retUser.getUser_id());
             jsonObject.put("message", "success");
             jsonObject.put("contents", retUser);
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getInformation(String user_id, int kind){
+        JSONObject jsonObject = new JSONObject();
+        User user = userMapper.selectById(user_id);
+        jsonObject.put("message", "success");
+        switch (kind){
+            case Constants.STORE: {
+                jsonObject.put("contents", user.getStoreSet());
+                break;
+            }
+            case Constants.ADDRESS: {
+                jsonObject.put("contents", user.getAddressSet());
+                break;
+            }
+            case Constants.ORDER: {
+                jsonObject.put("contents", user.getOrderSet());
+                break;
+            }
+            case Constants.APPLICATION: {
+                jsonObject.put("contents", user.getApplicationSet());
+                break;
+            }
+            case Constants.SHOPPINGLIST: {
+                jsonObject.put("contents", user.getShoppinglistSet());
+                break;
+            }
+            default:break;
         }
         return jsonObject;
     }

@@ -1,59 +1,85 @@
 package com.guliqi.bookstore.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.guliqi.bookstore.Constants;
 import com.guliqi.bookstore.mapper.ApplicationMapper;
+import com.guliqi.bookstore.mapper.UserMapper;
+import com.guliqi.bookstore.model.Address;
 import com.guliqi.bookstore.model.Application;
+import com.guliqi.bookstore.model.User;
 import com.guliqi.bookstore.utils.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class ApplicationService {
     private ApplicationMapper applicationMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    public ApplicationService(ApplicationMapper applicationMapper){
+    public ApplicationService(ApplicationMapper applicationMapper, UserMapper userMapper){
         this.applicationMapper = applicationMapper;
+        this.userMapper = userMapper;
     }
 
-    public JSONObject applyForStore(Application application){
+    public JSONObject applyForStore(String user_id, String storename, String address_id,
+                                    String bank_card, String introduction){
         JSONObject jsonObject = new JSONObject();
-        if (application.getAddress() == null || application.getBank_card() == null ||
-                application.getIntroduction() == null || application.getStorename() == null ||
-                application.getUser() == null)
-            jsonObject.put("message", "incomplete information");
+        User user = userMapper.selectById(user_id);
+        Address tmpAddress = null;
+        for (Address address : user.getAddressSet()){
+            if (address.getAddress_id().equals(address_id)){
+                tmpAddress = address;
+                break;
+            }
+        }
+        if (tmpAddress == null)
+            jsonObject.put("message", "address does not exist");
         else {
-            application.setState(Constants.CHECKPENDING);
-            application.setApplication_id(CommonUtil.UUID());
+            Application application = new Application.Builder().user(user).address(tmpAddress)
+                    .state(Constants.CHECKPENDING).application_id(CommonUtil.UUID())
+                    .storename(storename).bank_card(bank_card).introduction(introduction).build();
             if (applicationMapper.insert(application) < 1)
-                jsonObject.put("message", "Insert failed");
+                jsonObject.put("message", "insert failed");
             else {
                 jsonObject.put("message", "success");
-                jsonObject.put("contents", application);
+                jsonObject.put("application_id", application.getApplication_id());
             }
         }
         return jsonObject;
     }
 
-    public JSONObject checkApplication(Application application){
+    public JSONObject checkApplication(String admin, String application_id, String state){
         JSONObject jsonObject = new JSONObject();
-
-        if (!application.getState().equals(Constants.APPROVED) && !application.getState().equals(Constants.DISAPPROVED)) {
+        if (!state.equals(Constants.APPROVED) && !state.equals(Constants.DISAPPROVED)) {
             jsonObject.put("message", "invalid State");
             return jsonObject;
         }
-        Application current = applicationMapper.selectById(application.getApplication_id());
-        if (!current.getState().equals(Constants.CHECKPENDING))
+        String currentState = applicationMapper.selectState(application_id);
+        if (!currentState.equals(Constants.CHECKPENDING))
             jsonObject.put("message", "already checked");
         else {
+            Application application = new Application.Builder().application_id(application_id)
+                    .state(state).admin(admin).build();
             if (applicationMapper.updateStateById(application) < 1)
                 jsonObject.put("message", "update failed");
             else {
                 jsonObject.put("message", "success");
-                jsonObject.put("contents", application);
             }
         }
+        return jsonObject;
+    }
+
+    public JSONObject lookOver(){
+        JSONObject jsonObject = new JSONObject();
+        Set<Application> applications = applicationMapper.selectAllCheckPending();
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.addAll(applications);
+        jsonObject.put("message", "success");
+        jsonObject.put("contents", jsonArray);
         return jsonObject;
     }
 }

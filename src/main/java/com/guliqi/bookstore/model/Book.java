@@ -11,22 +11,24 @@ import java.io.Serializable;
 @JsonIgnoreProperties(value = {"handler"})
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class Book implements Serializable {
-
+    @JsonView(Views.WithoutUserView.class)
     private String book_id;
-
+    @JsonView(Views.WithoutUserView.class)
     private Store store;
-
+    @JsonView(Views.WithoutUserView.class)
     private String bookname;
-
+    @JsonView(Views.WithoutUserView.class)
     private Integer stock;
-
+    @JsonView(Views.WithoutUserView.class)
     private Float price;
-
+    @JsonView(Views.WithoutUserView.class)
     private String author;
-
+    @JsonView(Views.WithoutUserView.class)
     private Integer version;
-
+    @JsonView(Views.WithoutUserView.class)
     private String press;
-
+    @JsonView(Views.WithoutUserView.class)
     private String introduction;
+    @JsonView(Views.WithoutUserView.class)
+    private Integer sales;
 }

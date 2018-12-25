@@ -45,6 +45,10 @@ public interface ApplicationMapper {
     })
     Application selectById(String application_id);
 
+    //返回 state
+    @Select({"select state from Application where application_id = #{application_id,jdbcType=VARCHAR}"})
+    String selectState(String application_id);
+
     @Select({"select * from Application where user_id = #{user_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="application_id", property="application_id", jdbcType=JdbcType.VARCHAR, id=true),
@@ -56,4 +60,16 @@ public interface ApplicationMapper {
                             fetchType = FetchType.LAZY))
     })
     Set<Application> selectByUserId(String user_id);
+
+    @Select({"select * from Application where state = 'CHECKPENDING'"})
+    @Results({
+            @Result(column="application_id", property="application_id", jdbcType=JdbcType.VARCHAR, id=true),
+            @Result(column="user_id", property="user", jdbcType=JdbcType.VARCHAR,
+                    one = @One(select = "com.guliqi.bookstore.mapper.UserMapper.detailSelectById",
+                            fetchType = FetchType.LAZY)),
+            @Result(column="address_id", property="address", jdbcType=JdbcType.VARCHAR,
+                    one = @One(select = "com.guliqi.bookstore.mapper.AddressMapper.selectById",
+                            fetchType = FetchType.LAZY))
+    })
+    Set<Application> selectAllCheckPending();
 }

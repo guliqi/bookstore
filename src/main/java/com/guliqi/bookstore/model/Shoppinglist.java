@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(value = {"handler", "user"})
+@JsonIgnoreProperties(value = {"handler"})
 public class Shoppinglist implements Serializable {
     private String shoppingList_id;
 

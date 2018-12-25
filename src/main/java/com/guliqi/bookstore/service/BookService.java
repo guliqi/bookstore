@@ -39,10 +39,8 @@ public class BookService {
         book.setBook_id(CommonUtil.UUID());
         if (bookMapper.insert(book) < 1)
             jsonObject.put("message", "insert failed");
-        else {
-            jsonObject.put("contents", book);
+        else
             jsonObject.put("message", "success");
-        }
         return jsonObject;
     }
 

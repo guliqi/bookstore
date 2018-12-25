@@ -2,9 +2,10 @@ package com.guliqi.bookstore.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.guliqi.bookstore.Constants;
 import com.guliqi.bookstore.interceptor.UserLoginToken;
-import com.guliqi.bookstore.mapper.UserMapper;
 import com.guliqi.bookstore.model.User;
+import com.guliqi.bookstore.model.Views;
 import com.guliqi.bookstore.service.RedisService;
 import com.guliqi.bookstore.service.TokenService;
 import com.guliqi.bookstore.service.UserService;
@@ -30,12 +31,11 @@ public class UserController {
     }
 
     @ApiOperation(value = "测试用户注册")
-    @JsonView(User.UserDetailView.class)
+    @JsonView(Views.WithoutPasswordView.class)
     @PostMapping(value = "")
     public JSONObject register(@RequestBody User user){
         JSONObject jsonObject = userService.register(user);
         if (jsonObject.get("message") == "success"){
-            System.out.println(user.getUser_id());
             String token = tokenService.getToken(user);
             jsonObject.put("token", token);
         }
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "测试用户登录")
-    @JsonView(User.UserSimpleView.class)
+    @JsonView(Views.WithoutPasswordView.class)
     @PostMapping(value = "/token")
     public JSONObject login(@RequestBody Map<String, String> map){
         User user = new User(map.get("phone"), map.get("password"));
@@ -56,12 +56,39 @@ public class UserController {
     }
 
     @ApiOperation(value = "测试用户登出")
-    @UserLoginToken
     @DeleteMapping("/token")
+    @UserLoginToken
     public JSONObject logout(@RequestHeader String token){
         JSONObject jsonObject = new JSONObject();
         redisService.set(token, new Date().toString(), 1L);
         jsonObject.put("message", "success");
         return jsonObject;
+    }
+
+    @ApiOperation(value = "测试获取用户地址")
+    @GetMapping("/addresses")
+    @UserLoginToken
+    @JsonView(Views.WithoutUserView.class)
+    public JSONObject getAddresses(@RequestHeader String token){
+        String user_id = tokenService.getIdOrName(token);
+        return userService.getInformation(user_id, Constants.ADDRESS);
+    }
+
+    @ApiOperation(value = "测试获取用户申请")
+    @GetMapping("/applications")
+    @UserLoginToken
+    @JsonView(Views.WithoutUserView.class)
+    public JSONObject getApplications(@RequestHeader String token){
+        String user_id = tokenService.getIdOrName(token);
+        return userService.getInformation(user_id, Constants.APPLICATION);
+    }
+
+    @ApiOperation(value = "测试获取用户店铺")
+    @GetMapping("/stores")
+    @UserLoginToken
+    @JsonView(Views.WithoutUserView.class)
+    public JSONObject getStores(@RequestHeader String token){
+        String user_id = tokenService.getIdOrName(token);
+        return userService.getInformation(user_id, Constants.STORE);
     }
 }

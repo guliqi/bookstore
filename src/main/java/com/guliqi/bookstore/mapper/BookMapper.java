@@ -16,6 +16,7 @@ public interface BookMapper {
     })
     int deleteById(String book_id);
 
+    //todo: 店家修改书籍信息
     @Update({
         "update Book",
         "set store_id = #{store_id,jdbcType=VARCHAR},",
@@ -30,6 +31,13 @@ public interface BookMapper {
     })
     int updateById(Book record);
 
+    // 更新销量
+    @Update({
+            "update Book set sales = #{sales,jdbcType=INTEGER} + #{amount}",
+            "where book_id = #{book_id,jdbcType=VARCHAR}"
+    })
+    int updateSalesById(Book record, @Param("amount") int amount);
+
     @Insert({
             "insert into Book (book_id, store_id, bookname, stock, price, author, version, press, introduction)",
             "values (#{book_id,jdbcType=VARCHAR}, #{store.store_id,jdbcType=VARCHAR}, ",
@@ -39,7 +47,6 @@ public interface BookMapper {
     })
     int insert(Book record);
 
-    // store信息简单查询
     @Select({"select * from Book where book_id = #{book_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true),
@@ -49,7 +56,8 @@ public interface BookMapper {
     })
     Book selectById(String book_id);
 
-    @Select({"select book_id, bookname, price from Book where store_id = #{store_id,jdbcType=VARCHAR}"})
+    // 返回一个店铺的 book_id, bookname, price, sales 集合
+    @Select({"select book_id, bookname, price, sales from Book where store_id = #{store_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true),
     })

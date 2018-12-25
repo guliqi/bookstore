@@ -15,16 +15,16 @@ import java.util.Set;
 @JsonIgnoreProperties(value = {"handler"})
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class Store implements Serializable {
-
+    @JsonView(Views.WithoutUserView.class)
     private String store_id;
-
+    @JsonView(Views.WithoutUserView.class)
     private String storename;
-
+    @JsonView(Views.WithoutUserView.class)
     private String introduction;
-
+    @JsonView(Views.WithoutUserView.class)
     private Address address;
-
+    @JsonView(Views.WithUserView.class)
     private User shopKeeper;
-
+    @JsonView(Views.WithUserView.class)
     private Set<Book> bookSet;
 }

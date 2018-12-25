@@ -27,7 +27,7 @@ public class AdminController {
     }
 
     @ApiOperation("测试管理员登录")
-    @PostMapping("")
+    @PostMapping("/token")
     public JSONObject login(@RequestBody Admin admin){
         JSONObject jsonObject = adminService.login(admin);
         if (jsonObject.get("message") == "success"){

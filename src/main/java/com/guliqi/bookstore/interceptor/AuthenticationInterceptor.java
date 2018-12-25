@@ -48,9 +48,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             UserLoginToken userLoginToken = method.getAnnotation(UserLoginToken.class);
             if (userLoginToken.required()) {
                 if (token == null)
-                    throw new RuntimeException("无token，请重新登录");
+                    throw new RuntimeException("无效的token，请重新登录");
                 if (redisService.hasKey(token))
-                    throw new RuntimeException("token已失效，请重新登录");
+                    throw new RuntimeException("无效的token，请重新登录");
 
                 if (method.isAnnotationPresent(OnlyAdmin.class)) {
                     OnlyAdmin onlyAdmin = method.getAnnotation(OnlyAdmin.class);
@@ -67,7 +67,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                     }
                     Admin admin = adminMapper.selectByPrimaryKey(adminName);
                     if (admin == null)
-                        throw new RuntimeException("管理员，请重新登录");
+                        throw new RuntimeException("无效的token，请重新登录");
                     JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(admin.getPassword())).build();
                     try {
                         jwtVerifier.verify(token);
@@ -83,15 +83,15 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                     } catch (JWTDecodeException j) {
                         throw new RuntimeException("token解码错误");
                     }
-                    User user = userMapper.selectById(userId);
+                    User user = userMapper.selectPwdById(userId);
                     if (user == null)
-                        throw new RuntimeException("用户不存在，请重新登录");
+                        throw new RuntimeException("无效的token，请重新登录");
                     // 验证 token
                     JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
                     try {
                         jwtVerifier.verify(token);
                     } catch (JWTVerificationException e) {
-                        throw new RuntimeException("token已失效，请重新登录");
+                        throw new RuntimeException("无效的token，请重新登录");
                     }
                     return true;
                 }

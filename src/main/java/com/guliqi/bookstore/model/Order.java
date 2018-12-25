@@ -2,12 +2,17 @@ package com.guliqi.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@Data
-@JsonIgnoreProperties(value = {"handler", "user"})
+@Getter
+@Setter
+@NoArgsConstructor
+@JsonIgnoreProperties(value = {"handler"})
 public class Order implements Serializable {
     private String order_id;
 
