@@ -29,18 +29,19 @@ public class ApplicationService {
                                     String bank_card, String introduction){
         JSONObject jsonObject = new JSONObject();
         User user = userMapper.selectById(user_id);
-        Address tmpAddress = null;
+        Address inputAddress = new Address(address_id);
+        boolean addressExists = false;
         for (Address address : user.getAddressSet()){
-            if (address.getAddress_id().equals(address_id)){
-                tmpAddress = address;
+            if (address.equals(inputAddress)){
+                addressExists =true;
                 break;
             }
         }
-        if (tmpAddress == null)
+        if (!addressExists)
             jsonObject.put("message", "address does not exist");
         else {
-            Application application = new Application.Builder().user(user).address(tmpAddress)
-                    .state(Constants.CHECKPENDING).application_id(CommonUtil.UUID())
+            Application application = new Application.Builder().user(user).address(inputAddress)
+                    .state(Constants.APPLY_CHECKPENDING).application_id(CommonUtil.UUID())
                     .storename(storename).bank_card(bank_card).introduction(introduction).build();
             if (applicationMapper.insert(application) < 1)
                 jsonObject.put("message", "insert failed");
@@ -54,12 +55,12 @@ public class ApplicationService {
 
     public JSONObject checkApplication(String admin, String application_id, String state){
         JSONObject jsonObject = new JSONObject();
-        if (!state.equals(Constants.APPROVED) && !state.equals(Constants.DISAPPROVED)) {
+        if (!state.equals(Constants.APPLY_APPROVED) && !state.equals(Constants.APPLY_DISAPPROVED)) {
             jsonObject.put("message", "invalid State");
             return jsonObject;
         }
         String currentState = applicationMapper.selectState(application_id);
-        if (!currentState.equals(Constants.CHECKPENDING))
+        if (!currentState.equals(Constants.APPLY_CHECKPENDING))
             jsonObject.put("message", "already checked");
         else {
             Application application = new Application.Builder().application_id(application_id)

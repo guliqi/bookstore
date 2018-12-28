@@ -29,7 +29,7 @@ public class BookService {
         Set<Store> stores = storeMapper.selectByUserId(user_id);
         boolean storeExists = false;
         for (Store store : stores){
-            if (store.getStore_id().equals(book.getStore().getStore_id())) {
+            if (store.equals(book.getStore())) {
                 storeExists = true;
                 break;
             }

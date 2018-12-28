@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link th:href="@{/css/bootstrap.css}" href="../static/css/bootstrap.css" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-theme.css}" href="../static/css/bootstrap-theme.css"
+          rel="stylesheet"/>
+    <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        function register() {
+            var pwd1 = $('#password').val();
+            var pwd2 = $('#repeat').val();
+            if (pwd1 !== pwd2){
+                alert("The password did not match the re-typed password");
+                return false;
+            }
+            var postdata = {
+                "phone": $('#phone').val(),
+                "password": pwd1,
+                "nickname": $('#nickname').val(),
+                "idcard": $('#idcard').val(),
+                "realname": $('#realname').val(),
+                "gender": $('input:radio[name="gender"]:checked').val()
+            };
+            $.post({
+                dataType:"json",
+                contentType: "application/json; charset=utf-8",
+                url: "/user",
+                data: JSON.stringify(postdata),
+                success: function (result) {
+                    if (result.message !== "success"){
+                        alert(result.message);
+                        return false;
+                    }
+                    window.location.href = "index";
+                }
+            },"json");
+        }
+    </script>
+</head>
+<body>
+<div class="container" style="margin-top: 100px">
+    <form role="form" id="register_form" class="col-md-offset-4 col-md-4 form-horizontal">
+        <h2 class="text-center">oBook<small style="color: purple">register</small></h2>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="text" class="form-control" name="phone" id="phone" placeholder="*phone" required autofocus>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="password" class="form-control" name="password" id="password" placeholder="*password" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="password" class="form-control" id="repeat" placeholder="*repeat password" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="text" class="form-control" name="nickname" id="nickname" placeholder="nickname">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="text" class="form-control" name="idcard" id="idcard" placeholder="idcard">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="text" class="form-control" name="realname" id="realname" placeholder="realname">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="radio">
+                <div class="col-md-4 col-md-offset-1">
+                    <input type="radio" name="gender" id="male" value="M"/><label>Male</label>
+                </div>
+                <div class="col-md-3">
+                    <input type="radio" name="gender" id="female" value="F"/><label>Female</label>
+                </div>
+                <div class="col-md-3 col-md-offset-1">
+                    <input type="radio" name="gender" id="secret" value="" checked/><label>Secret</label>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-info center-block" onclick="register()">Register</button>
+    </form>
+</div>
+</body>
+</html>

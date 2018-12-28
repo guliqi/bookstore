@@ -9,10 +9,13 @@ import com.guliqi.bookstore.model.Views;
 import com.guliqi.bookstore.service.RedisService;
 import com.guliqi.bookstore.service.TokenService;
 import com.guliqi.bookstore.service.UserService;
+import com.guliqi.bookstore.utils.CookieUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,11 +36,12 @@ public class UserController {
     @ApiOperation(value = "测试用户注册")
     @JsonView(Views.WithoutPasswordView.class)
     @PostMapping(value = "")
-    public JSONObject register(@RequestBody User user){
+    public JSONObject register(@RequestBody User user, HttpServletResponse response){
         JSONObject jsonObject = userService.register(user);
         if (jsonObject.get("message") == "success"){
             String token = tokenService.getToken(user);
-            jsonObject.put("token", token);
+            Cookie cookie = CookieUtil.getTokenCookie(Constants.LOCALHOST, "/", token);
+            response.addCookie(cookie);
         }
         return jsonObject;
     }
@@ -45,13 +49,25 @@ public class UserController {
     @ApiOperation(value = "测试用户登录")
     @JsonView(Views.WithoutPasswordView.class)
     @PostMapping(value = "/token")
-    public JSONObject login(@RequestBody Map<String, String> map){
+    public JSONObject login(@RequestBody Map<String, String> map, HttpServletResponse response){
         User user = new User(map.get("phone"), map.get("password"));
         JSONObject jsonObject = userService.login(user);
         if (jsonObject.get("message") == "success"){
             String token = tokenService.getToken(user);
-            jsonObject.put("token", token);
+            Cookie cookie = CookieUtil.getTokenCookie(Constants.LOCALHOST, "/", token);
+            response.addCookie(cookie);
         }
+        return jsonObject;
+    }
+
+    @ApiOperation(value = "测试检验token")
+    @PostMapping(value = "/token/pass")
+    @UserLoginToken
+    public JSONObject pass(@RequestHeader String token, HttpServletResponse response){
+        JSONObject jsonObject = new JSONObject();
+        Cookie cookie = CookieUtil.getTokenCookie(Constants.LOCALHOST, "/", token);
+        response.addCookie(cookie);
+        jsonObject.put("message", "success");
         return jsonObject;
     }
 

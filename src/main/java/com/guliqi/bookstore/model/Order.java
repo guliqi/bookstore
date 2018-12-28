@@ -1,10 +1,8 @@
 package com.guliqi.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +10,9 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(value = {"handler"})
+@JsonSerialize(include= JsonSerialize.Inclusion.NON_EMPTY)
 public class Order implements Serializable {
     private String order_id;
 

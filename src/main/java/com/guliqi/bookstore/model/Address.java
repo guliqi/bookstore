@@ -29,4 +29,15 @@ public class Address implements Serializable {
     public Address(String address_id){
         this.address_id = address_id;
     }
+
+    @Override
+    public int hashCode() {
+        return address_id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        assert obj instanceof Address;
+        return address_id.equals(((Address) obj).address_id);
+    }
 }

@@ -31,7 +31,7 @@ public interface BookMapper {
     })
     int updateById(Book record);
 
-    // 更新销量
+    // 更新sales
     @Update({
             "update Book set sales = #{sales,jdbcType=INTEGER} + #{amount}",
             "where book_id = #{book_id,jdbcType=VARCHAR}"

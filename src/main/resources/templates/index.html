@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>oBook</title>
+    <link th:href="@{/css/bootstrap.css}" href="../static/css/bootstrap.css" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-theme.css}" href="../static/css/bootstrap-theme.css"
+          rel="stylesheet"/>
+    <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
+    <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        input#search {
+            background-image: url(../static/icon/search.png);
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+        input#search:focus {
+            background-image: none;
+        }
+    </style>
+
+</head>
+<body>
+<nav class="navbar-inverse visible-lg visible-md" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: #adadad" href="#"><span style="font-size: larger">oBook  </span>
+                <small style="color: #5e5e5e">your online book store</small></a>
+        </div>
+
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Account</a></li>
+            <li><a href="#">Favourite</a></li>
+            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">Orders</a></li>
+        </ul>
+
+        <form class="navbar-form navbar-left">
+            <div class="form-group">
+                <input type="text" id="search" class="form-control"/>
+            </div>
+            <button type="button" class="btn btn-default">Search</button>
+        </form>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+            </li>
+        </ul>
+
+    </div>
+</nav>
+</body>
+</html>

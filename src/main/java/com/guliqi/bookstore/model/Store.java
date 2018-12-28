@@ -27,4 +27,15 @@ public class Store implements Serializable {
     private User shopKeeper;
     @JsonView(Views.WithUserView.class)
     private Set<Book> bookSet;
+
+    @Override
+    public int hashCode() {
+        return store_id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        assert obj instanceof Store;
+        return store_id.equals(((Store) obj).store_id);
+    }
 }
