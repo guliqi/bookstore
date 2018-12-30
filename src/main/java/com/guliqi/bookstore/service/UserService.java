@@ -37,7 +37,7 @@ public class UserService {
         }
         return jsonObject;
     }
-
+    //todo: contents只需要返回id
     public JSONObject login(User user){
         JSONObject jsonObject = new JSONObject();
         user.setPassword(MD5Util.MD5Encode(user.getPassword()));
@@ -48,6 +48,18 @@ public class UserService {
             user.setUser_id(retUser.getUser_id());
             jsonObject.put("message", "success");
             jsonObject.put("contents", retUser);
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getProfile(String user_id){
+        JSONObject jsonObject = new JSONObject();
+        User user = userMapper.detailSelectById(user_id);
+        if (user == null)
+            jsonObject.put("message", "user does not exists");
+        else {
+            jsonObject.put("message", "success");
+            jsonObject.put("contents", user);
         }
         return jsonObject;
     }

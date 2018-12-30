@@ -42,8 +42,8 @@ public interface UserMapper {
     @Select({"select phone, gender, nickname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     User simpleSelectById(String user_id);
 
-    // 返回 phone, gender, nickname, idcard, realname
-    @Select({"select phone, gender, nickname, idcard, realname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    // 返回 user_id, phone, gender, nickname, idcard, realname
+    @Select({"select user_id, phone, gender, nickname, idcard, realname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     User detailSelectById(String user_id);
 
     // 返回 user_id, password

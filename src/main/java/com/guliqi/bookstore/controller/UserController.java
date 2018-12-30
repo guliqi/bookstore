@@ -60,14 +60,24 @@ public class UserController {
         return jsonObject;
     }
 
+    @ApiOperation(value = "测试获取用户信息")
+    @UserLoginToken
+    @GetMapping(value = "/profile")
+    public JSONObject profile(@RequestHeader String token){
+        String user_id = tokenService.getIdOrName(token);
+        return userService.getProfile(user_id);
+    }
+
     @ApiOperation(value = "测试检验token")
     @PostMapping(value = "/token/pass")
     @UserLoginToken
     public JSONObject pass(@RequestHeader String token, HttpServletResponse response){
         JSONObject jsonObject = new JSONObject();
-        Cookie cookie = CookieUtil.getTokenCookie(Constants.LOCALHOST, "/", token);
-        response.addCookie(cookie);
+        String user_id = tokenService.getIdOrName(token);
+//        Cookie cookie = CookieUtil.getTokenCookie(Constants.LOCALHOST, "/", token);
+//        response.addCookie(cookie);
         jsonObject.put("message", "success");
+        jsonObject.put("user_id", user_id);
         return jsonObject;
     }
 

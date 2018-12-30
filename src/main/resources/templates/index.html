@@ -9,10 +9,46 @@
     <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
     <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
     <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
-
+    <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
+    <script type="text/javascript">
+        function sendToken() {
+            var token = $.cookie('token');
+            if (token != null) {
+                $.post({
+                    headers: {
+                        "token": token
+                    },
+                    dataType: "json",
+                    url: "/user/token/pass",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result.message === "success"){
+                            $('#login')[0].style.display = "none";
+                            $('#logout')[0].style.display = "block";
+                            $('#account').attr('href','/account?user_id=' + result.user_id);
+                            $('#cart').attr('href','/cart?user_id=' + result.user_id);
+                            $('#orders').attr('href','/orders?user_id=' + result.user_id);
+                        }
+                    },
+                    error: function () {
+                        $.cookie('token', '', {expires: -1});
+                        $('#logout')[0].style.display = "none";
+                        $('#login')[0].style.display = "block";
+                    }
+                })
+            }
+            else {
+                $('#logout')[0].style.display = "none";
+                $('#login')[0].style.display = "block";
+                $('#account').attr('href','login');
+                $('#cart').attr('href','login');
+                $('#orders').attr('href','login');
+            }
+        }
+    </script>
     <style type="text/css">
         input#search {
-            background-image: url(../static/icon/search.png);
+            background-image: url(/icon/search.png);
             background-repeat: no-repeat;
             background-size: contain;
         }
@@ -22,19 +58,19 @@
     </style>
 
 </head>
-<body>
-<nav class="navbar-inverse visible-lg visible-md" role="navigation">
+<body onload="sendToken()">
+<nav class="navbar-inverse visible-lg visible-md visible-sm" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" style="color: #adadad" href="#"><span style="font-size: larger">oBook  </span>
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">oBook  </span>
                 <small style="color: #5e5e5e">your online book store</small></a>
         </div>
 
         <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#">Account</a></li>
-            <li><a href="#">Favourite</a></li>
-            <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">Orders</a></li>
+            <li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span>Home</a></li>
+            <li><a href="#" id="account"><span class="glyphicon glyphicon-user"></span>Account</a></li>
+            <li><a href="#" id="cart"><span class="glyphicon glyphicon-shopping-cart"></span>Cart</a></li>
+            <li><a href="#" id="orders"><span class="glyphicon glyphicon-list-alt"></span>Orders</a></li>
         </ul>
 
         <form class="navbar-form navbar-left">
@@ -46,7 +82,8 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li>
-                <a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+                <a href="login" id="login" style="display: none"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+                <a href="index" id="logout" style="display: none" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
             </li>
         </ul>
 
