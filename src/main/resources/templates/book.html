@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-theme.min.css}" href="../static/css/bootstrap-theme.min.css"
+          rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-table.min.css}" href="../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_990690_11f0h51igp8f.css">
+    <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
+    <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
+    <script th:src="@{/js/address.js}" src="../static/js/address.js"></script>
+    <script th:src="@{/js/web3.min.js}" src="../static/js/web3.min.js"></script>
+    <script th:src="@{/js/ethereum.js}" src="../static/js/ethereum.js"></script>
+
+    <script type="text/javascript">
+
+        var addressIdArray = [];
+        var store_id = "error";
+        function bootDetail() {
+            $.get({
+                data: {"book_id": $.getUrlParam('book_id')},
+                dataType: "json",
+                url: "/request/book",
+                success: function (result) {
+                    if (result.message === "success") {
+                        var store = result.contents.store;
+                        store_id = store.store_id;
+                        $('#title')[0].innerHTML = store.storename;
+                        $('#storename')[0].innerHTML = store.storename;
+                        $('#introduction')[0].innerHTML = store.introduction;
+                        $('#address')[0].innerHTML = store.address.line1 + ', ' +
+                            store.address.city + ', ' +
+                            store.address.province;
+                        $('#ether_address')[0].innerHTML = store.address.user.ether_address;
+                        var owner = store.address.user.nickname;
+                        $('#owner')[0].innerHTML = 'Own By ' + (owner === null ? store.address.user.phone : owner);
+
+                        var version = result.contents.version;
+                        $('#bookname')[0].innerHTML = result.contents.bookname;
+                        if (version !== null && version !== '')
+                            $('#bookname')[0].innerHTML += ' (' + result.contents.version + 'th)';
+                        $('#author')[0].innerHTML = result.contents.author;
+                        $('#press')[0].innerHTML = result.contents.press;
+                        $('#price')[0].innerHTML = result.contents.price;
+                        $('#stock')[0].innerHTML = result.contents.stock;
+                        $('#sales')[0].innerHTML = result.contents.sales;
+                        $('#bookintro')[0].innerHTML = result.contents.introduction;
+                    }
+                },
+                error: function () {
+                    
+                }
+            });
+        }
+
+        function getEtherAddress() {
+            var token = $.cookie('token');
+            if (token != null) {
+                $.get({
+                    headers: {
+                        "token": token
+                    },
+                    dataType: "json",
+                    url: "/user/profile",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result.message === "success"){
+                            $('#ether_from').attr('value', result.contents.ether_address);
+                        }
+                    },
+                    error: function () {
+                        $.cookie('token', '', {expires: -1});
+                        window.location.href="error";
+                    }
+                })
+            }
+            else {
+                window.location.href="login";
+            }
+        }
+
+        function sendToken(){
+            bootDetail();
+            var token = $.cookie('token');
+            if (token != null) {
+                $.post({
+                    headers: {
+                        "token": token
+                    },
+                    dataType: "json",
+                    url: "/user/token/pass",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result.message === "success"){
+                            $('#login')[0].style.display = "none";
+                            $('#logout')[0].style.display = "block";
+                        }
+                    },
+                    error: function () {
+                        $.cookie('token', '', {expires: -1});
+                        $('#logout')[0].style.display = "none";
+                        $('#login')[0].style.display = "block";
+                    }
+                })
+            }
+            else {
+                $('#logout')[0].style.display = "none";
+                $('#login')[0].style.display = "block";
+            }
+        }
+
+        function purchase(address_id, amount, comments, tx_id){
+            var token = $.cookie('token');
+            var postdata = {
+                "book": {
+                    "book_id": $.getUrlParam('book_id')
+                },
+                "address": {
+                    "address_id": address_id
+                },
+                "amount": amount,
+                "comments": comments,
+                "tx_id": tx_id
+            };
+
+            if (token != null) {
+                $.post({
+                    headers: {
+                        "token": token
+                    },
+                    data: JSON.stringify(postdata),
+                    dataType: "json",
+                    url: "/request/order",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result.message !== "success"){
+                            alert(result.message);
+                        }
+                        else {
+                            $('#balance')[0].innerHTML = web3.eth.getBalance($('#ether_from').val()) / Math.pow(10, 18);
+                        }
+                    },
+                    error: function () {
+                        $.cookie('token', '', {expires: -1});
+                        window.location.href = "error";
+                    }
+                });
+            }
+            else {
+                window.location.href = "login";
+            }
+        }
+
+        function pay(){
+
+        }
+
+        $(function () {
+            $(".dropdown").mouseover(function () {
+                $(this).addClass("open");
+            });
+            $(".dropdown").mouseleave(function(){
+                $(this).removeClass("open");
+            });
+            $('#store').click(function () {
+                window.location.href = "store?store_id=" + store_id;
+            });
+            $('#input_amount').on('input', function () {
+                $('#total_price').attr('value', $(this).val() * $('#price')[0].innerHTML);
+            });
+            $('#purchaseModal').on('show.bs.modal', function () {
+                $('#purchaseSureBtn').removeAttr("disabled");
+            })
+        });
+
+        $(document).ready(function(){
+           $('#purchase').click(function () {
+               getAddress(false, $('#input_receiving_address'));
+               getEtherAddress();
+               $("#purchaseTitle").text('Fill with the information about your purchase. ' +
+                   'Pay attention to adding address beforehand for the sake of receiving address.');
+               $('#purchaseModal').modal('show');
+               $('#ether_to').attr('value', $('#ether_address')[0].innerHTML);
+               $('#total_price').attr('value', $('#input_amount').val() * $('#price')[0].innerHTML)
+           });
+
+           $('#purchaseSureBtn').click(function () {
+               $(this).attr("disabled","disabled");
+               var createdEvent = contract.Created();
+               createdEvent.watch(function(error, result){
+                   if (!error)
+                   {
+                       purchase(inputAddressId, inputAmount, inputComments, result.args._txId);
+                       createdEvent.stopWatching();
+                       $("#payTitle").text('Paying NOW or LATER');
+                       $('#payModal').modal('show');
+                   } else {
+                       console.log(error);
+                   }
+               });
+               var inputAmount = $('#input_amount').val();
+               var inputAddressId = addressIdArray[$('#input_receiving_address').val()];
+               var inputComments = $('#input_comments').val();
+               create($('#ether_from').val(), $('#ether_to').val(), $('#total_price').val() * Math.pow(10, 18));
+           });
+        });
+    </script>
+
+</head>
+<body onload="sendToken()">
+<nav class="navbar-inverse visible-lg visible-md visible-sm" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">oBook  </span>
+                <small style="color: #5e5e5e">your online book store</small></a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="dropdown">
+                <a href="#" data-toggle="dropdown" id="store"><span class="icon iconfont icon-store1"></span>
+                    <span id="title">Unknown</span></a>
+                <div class="dropdown-menu" style="width: max-content">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" align="center">Store Profile</div>
+                        <div class="panel-body">
+                            <table class="table table-striped table-hover table-bordered table-condensed" id="storeTable">
+                                <tbody>
+                                <tr align="center" valign="middle">
+                                    <td>Store Name</td>
+                                    <td id="storename"></td>
+                                </tr>
+                                <tr align="center" valign="middle">
+                                    <td>Introduction</td>
+                                    <td id="introduction"></td>
+                                </tr>
+                                <tr align="center" valign="middle">
+                                    <td>Address</td>
+                                    <td id="address"></td>
+                                </tr>
+                                <tr align="center" valign="middle">
+                                    <td>Ether Address</td>
+                                    <td id="ether_address"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="panel-footer">
+                            <p align="right" id="owner"></p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="login" id="login" style="display: none"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+                <a href="index" id="logout" style="display: none" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2" style="margin-top: 100px">
+            <img src="/icon/springboot.jpg" width='100%' height='auto'>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2">
+            <div class="panel-group" id="detail">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#detail" href="#collapse">
+                                <p><span style="font-weight: bold">Book Name:&nbsp</span><i id="bookname"></i></p>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapse" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <p><span style="font-weight: bold">Author:&nbsp</span><span id="author"></span></p>
+                            <p><span style="font-weight: bold">Press:&nbsp</span><span id="press"></span></p>
+                            <p><span style="font-weight: bold">Price:&nbsp</span><span id="price"></span><span>&nbspether</span></p>
+                            <p><span style="font-weight: bold">Stock:&nbsp</span><span id="stock"></span></p>
+                            <p><span style="font-weight: bold">Sales:&nbsp</span><span id="sales"></span></p>
+                            <p><span style="font-weight: bold">Introduction:&nbsp</span><span id="bookintro"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-2 col-md-offset-4 col-sm-4 col-sm-offset-2">
+            <input type="button" id="purchase" class="btn btn-info btn-block" value="purchase" style="margin-bottom: 20px">
+        </div>
+        <div class="col-md-2 col-sm-4">
+            <input type="button" id="addToChart" class="btn btn-warning btn-block" value="add to chart" style="margin-bottom: 20px">
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="purchaseModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="purchaseTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="input_amount" class="col-form-label">Amount</label>
+                        <input type="text" class="form-control" id="input_amount" value="1"
+                               oninput="value = value.replace(/[^\d]/g,'')">
+                    </div>
+                    <div class="form-group">
+                        <label for="input_amount" class="col-form-label">Price</label>
+                        <div>
+                            <input type="text" readonly class="form-control-inline form-control" style="width: 80%" id="total_price"/>
+                            <input type="text" readonly class="form-control-inline form-control" style="width: 19%; text-align: center" value="ether"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input_receiving_address" class="col-form-label">Receiving Address</label>
+                        <select class="form-control" id="input_receiving_address">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input_comments" class="col-form-label">Ether From</label>
+                        <input type="text" readonly class="form-control" id="ether_from">
+                    </div>
+                    <div class="form-group">
+                        <label for="input_comments" class="col-form-label">Ether To</label>
+                        <input type="text" readonly class="form-control" id="ether_to">
+                    </div>
+                    <div class="form-group">
+                        <label for="input_comments" class="col-form-label">Comments</label>
+                        <input type="text" class="form-control" id="input_comments">
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="purchaseSureBtn">submit order (consume gas)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="payModal" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true" style="top: 200px">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="payTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span>Balance: </span><span id="balance"></span><span> ether</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="paySureBtn">pay now</button>
+                <button type="button" class="btn btn-warning" id="laterBtn">later</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

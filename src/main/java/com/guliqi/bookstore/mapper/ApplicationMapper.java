@@ -17,10 +17,10 @@ public interface ApplicationMapper {
     int deleteById(String application_id);
 
     @Insert({
-            "insert into Application (application_id, user_id, storename, address_id, bank_card, state, introduction)",
+            "insert into Application (application_id, user_id, storename, address_id, ether_address, state, introduction)",
             "values (#{application_id,jdbcType=VARCHAR}, #{user.user_id,jdbcType=VARCHAR}, ",
             "#{storename,jdbcType=VARCHAR}, #{address.address_id,jdbcType=VARCHAR}, ",
-            "#{bank_card,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, ",
+            "#{ether_address,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, ",
             "#{introduction,jdbcType=VARCHAR})"
     })
     int insert(Application record);

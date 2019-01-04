@@ -24,6 +24,7 @@ public interface UserMapper {
             "nickname = #{nickname,jdbcType=VARCHAR},",
             "IDcard = #{idcard,jdbcType=VARCHAR},",
             "realname = #{realname,jdbcType=VARCHAR}",
+            "ether_address = #{ether_address,jdbcType=VARCHAR}",
             "where user_id = #{user_id,jdbcType=VARCHAR}"
     })
     int updateById(User record);
@@ -31,19 +32,19 @@ public interface UserMapper {
     @Insert({
             "insert into JavaEE.User (user_id, phone, ",
             "password, gender, nickname, ",
-            "IDcard, realname)",
+            "IDcard, realname, ether_address)",
             "values (#{user_id,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, ",
             "#{password,jdbcType=VARCHAR}, #{gender,jdbcType=CHAR}, #{nickname,jdbcType=VARCHAR}, ",
-            "#{idcard,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR})"
+            "#{idcard,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{ether_address,jdbcType=VARCHAR})"
     })
     int insert(User record);
 
-    // 返回 phone, gender, nickname
-    @Select({"select phone, gender, nickname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    // 返回 phone, gender, nickname, ether_address
+    @Select({"select phone, gender, nickname, ether_address from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     User simpleSelectById(String user_id);
 
-    // 返回 user_id, phone, gender, nickname, idcard, realname
-    @Select({"select user_id, phone, gender, nickname, idcard, realname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    // 返回 user_id, phone, gender, nickname, idcard, realname, ether_address
+    @Select({"select user_id, phone, gender, nickname, idcard, realname, ether_address from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     User detailSelectById(String user_id);
 
     // 返回 user_id, password
@@ -55,7 +56,7 @@ public interface UserMapper {
 
     // 返回 user_id, phone, gender, nickname, idcard, realname
     // 懒加载 store, order, shoppinglist, address, application
-    @Select({"select user_id, phone, gender, nickname, idcard, realname from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
+    @Select({"select user_id, phone, gender, nickname, idcard, realname, ether_address from JavaEE.User where user_id = #{user_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="user_id", property="user_id", jdbcType=JdbcType.VARCHAR, id=true),
             @Result(column="IDcard", property="idcard", jdbcType=JdbcType.VARCHAR),

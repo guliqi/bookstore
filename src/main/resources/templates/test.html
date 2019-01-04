@@ -2,51 +2,274 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>test</title>
     <link th:href="@{/css/bootstrap.css}" href="../static/css/bootstrap.css" rel="stylesheet"/>
     <link th:href="@{/css/bootstrap-theme.css}" href="../static/css/bootstrap-theme.css"
           rel="stylesheet"/>
-    <link rel="stylesheet" href="//at.alicdn.com/t/font_990690_we5s0dydwuq.css">
-
     <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
     <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
     <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
     <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
+    <script th:src="@{/js/web3.min.js}" src="../static/js/web3.min.js"></script>
 </head>
 <body>
-<ul id="myTab" class="nav nav-tabs">
-    <li class="active">
-        <a href="#home" data-toggle="tab">
-            菜鸟教程
-        </a>
-    </li>
-    <li><a href="#ios" data-toggle="tab">iOS</a></li>
-    <li class="dropdown">
-        <a href="#" id="myTabDrop1" class="dropdown-toggle"
-           data-toggle="dropdown">Java
-            <b class="caret"></b>
-        </a>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
-            <li><a href="#jmeter" tabindex="-1" data-toggle="tab">jmeter</a></li>
-            <li><a href="#ejb" tabindex="-1" data-toggle="tab">ejb</a></li>
-        </ul>
-    </li>
-</ul>
-<div id="myTabContent" class="tab-content">
-    <div class="tab-pane fade in active" id="home">
-        <p>菜鸟教程是一个提供最新的web技术站点，本站免费提供了建站相关的技术文档，帮助广大web技术爱好者快速入门并建立自己的网站。菜鸟先飞早入行——学的不仅是技术，更是梦想。</p>
-    </div>
-    <div class="tab-pane fade" id="ios">
-        <p>iOS 是一个由苹果公司开发和发布的手机操作系统。最初是于 2007 年首次发布 iPhone、iPod Touch 和 Apple
-            TV。iOS 派生自 OS X，它们共享 Darwin 基础。OS X 操作系统是用在苹果电脑上，iOS 是苹果的移动版本。</p>
-    </div>
-    <div class="tab-pane fade" id="jmeter">
-        <p>jMeter 是一款开源的测试软件。它是 100% 纯 Java 应用程序，用于负载和性能测试。</p>
-    </div>
-    <div class="tab-pane fade" id="ejb">
-        <p>Enterprise Java Beans（EJB）是一个创建高度可扩展性和强大企业级应用程序的开发架构，部署在兼容应用程序服务器（比如 JBOSS、Web Logic 等）的 J2EE 上。
-        </p>
-    </div>
+<div class="container">
+
+    <h1>Info Contract</h1>
+
+    <h2 id="info"></h2>
+
+    <label for="name" class="col-md-2 control-label">Name</label>
+    <input id="name" type="text">
+
+    <label for="name" class="col-md-2 control-label">Age</label>
+    <input id="age" type="text">
+
+    <button id="button">Update Info</button>
+
+    <script>
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+        }
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        var myContract = web3.eth.contract([
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_sellerAddr",
+                        "type": "address"
+                    },
+                    {
+                        "name": "_price",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "create",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_txId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "deliver",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Transaction",
+                "outputs": [
+                    {
+                        "name": "txId",
+                        "type": "uint256"
+                    },
+                    {
+                        "name": "buyerAddr",
+                        "type": "address"
+                    },
+                    {
+                        "name": "sellerAddr",
+                        "type": "address"
+                    },
+                    {
+                        "name": "price",
+                        "type": "uint256"
+                    },
+                    {
+                        "name": "state",
+                        "type": "uint8"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_txId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "pay",
+                "outputs": [],
+                "payable": true,
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_txId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "receive",
+                "outputs": [],
+                "payable": true,
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_txId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "abort",
+                "outputs": [],
+                "payable": true,
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "name": "_sender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "_message",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "_txId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Created",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "name": "_sender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "_message",
+                        "type": "string"
+                    }
+                ],
+                "name": "Paid",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "name": "_sender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "_message",
+                        "type": "string"
+                    }
+                ],
+                "name": "Aborted",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "name": "_sender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "_message",
+                        "type": "string"
+                    }
+                ],
+                "name": "Delivered",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "name": "_sender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "_message",
+                        "type": "string"
+                    }
+                ],
+                "name": "Received",
+                "type": "event"
+            }
+        ]);
+        var contract = myContract.at('0x9ce774fca17f26a04e2947ed5547909a8115cc7b');
+        var events = [];
+        var createdEvent = contract.Created();
+        var paidEvent = contract.Paid();
+        var abortedEvent = contract.Aborted();
+        var deliveredEvent = contract.Delivered();
+        var receivedEvent = contract.Received();
+        events.push([createdEvent, paidEvent, abortedEvent, deliveredEvent, receivedEvent]);
+
+        $.each(events, function () {
+            $(this).watch(function(error, result) {
+                if (!error)
+                {
+                    console.log(result);
+                } else {
+                    console.log(error);
+                }
+            });
+        });
+
+        contract.pay.sendTransaction({value:web3.toWei(1,'ether'), from: '0x365417A7C5A099f26844De40B568c0C28968A524'}, function (error, result) {
+            if (!error)
+                console.log(result);
+            else console.log(error);
+        });
+
+        // contract.abort.sendTransaction({from: web3.eth.accounts[1]}, function (error, result) {
+        //     if (!error)
+        //         console.log(result);
+        //     else console.log(error);
+        // });
+    </script>
+
 </div>
+
 </body>
 </html>

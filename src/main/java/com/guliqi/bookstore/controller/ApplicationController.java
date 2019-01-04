@@ -28,13 +28,13 @@ public class ApplicationController {
     @UserLoginToken
     @ApiOperation(value = "测试申请开店")
     @PostMapping(value = "/new")
-    public JSONObject apply(@RequestHeader String token,
-                            @RequestParam String storename, @RequestBody Map<String, String> map){
+    public JSONObject apply(@RequestHeader String token, @RequestBody Map<String, String> map){
         String user_id = tokenService.getIdOrName(token);
+        String storename = map.get("storename");
         String address_id = map.get("address_id");
         String bank_card = map.get("bank_card");
         String introduction = map.get("introduction");
-        if (address_id == null || bank_card == null || introduction == null)
+        if (storename == null || address_id == null || bank_card == null || introduction == null)
             throw new RuntimeException("incomplete information");
         return applicationService.applyForStore(user_id, storename, address_id, bank_card, introduction);
     }

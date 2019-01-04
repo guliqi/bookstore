@@ -24,12 +24,12 @@ public interface OrderMapper {
     int updateById(Order record);
 
     @Insert({
-            "insert into JavaEE.Order (order_id, user_id, book_id, amount, address_id, comments, state, store_id, payment)",
+            "insert into JavaEE.Order (order_id, user_id, book_id, amount, address_id, comments, state, store_id, payment, tx_id)",
             "values (#{order_id,jdbcType=VARCHAR}, #{user.user_id,jdbcType=VARCHAR}, ",
             "#{book.book_id,jdbcType=VARCHAR}, ",
             "#{amount,jdbcType=INTEGER}, #{address.address_id,jdbcType=VARCHAR}, ",
             "#{comments,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, ",
-            "#{store.store_id,jdbcType=VARCHAR}, #{payment,jdbcType=REAL})"
+            "#{store.store_id,jdbcType=VARCHAR}, #{payment,jdbcType=REAL}, #{tx_id,jdbcType=INTEGER})"
     })
     int insert(Order record);
 

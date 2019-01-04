@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/book")
+@RequestMapping(value = "/request/book")
 public class BookController {
     private BookService bookService;
     private TokenService tokenService;

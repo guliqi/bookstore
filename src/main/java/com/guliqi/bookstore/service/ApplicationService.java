@@ -26,7 +26,7 @@ public class ApplicationService {
     }
 
     public JSONObject applyForStore(String user_id, String storename, String address_id,
-                                    String bank_card, String introduction){
+                                    String ether_addresss, String introduction){
         JSONObject jsonObject = new JSONObject();
         User user = userMapper.selectById(user_id);
         Address inputAddress = new Address(address_id);
@@ -42,7 +42,7 @@ public class ApplicationService {
         else {
             Application application = new Application.Builder().user(user).address(inputAddress)
                     .state(Constants.APPLY_CHECKPENDING).application_id(CommonUtil.UUID())
-                    .storename(storename).bank_card(bank_card).introduction(introduction).build();
+                    .storename(storename).ether_address(ether_addresss).introduction(introduction).build();
             if (applicationMapper.insert(application) < 1)
                 jsonObject.put("message", "insert failed");
             else {

@@ -33,4 +33,18 @@ public class Order implements Serializable {
     private Store store;
 
     private Float payment;
+
+    private Integer tx_id;
+
+
+    @Override
+    public int hashCode() {
+        return order_id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        assert obj instanceof Order;
+        return ((Order) obj).order_id.equals(order_id);
+    }
 }

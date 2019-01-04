@@ -22,11 +22,26 @@ public class AddressController {
     }
 
     @ApiOperation(value = "测试添加地址")
-    @PostMapping
+    @PostMapping("")
     @UserLoginToken
     public JSONObject addAddress(@RequestHeader String token, @RequestBody Address address){
         String user_id = tokenService.getIdOrName(token);
         return addressService.addAddress(address, user_id);
     }
 
+    @ApiOperation(value = "测试修改地址")
+    @PutMapping("")
+    @UserLoginToken
+    public JSONObject updateAddress(@RequestHeader String token, @RequestBody Address address){
+        String user_id = tokenService.getIdOrName(token);
+        return addressService.updateAddress(address, user_id);
+    }
+
+    @ApiOperation(value = "测试删除地址")
+    @DeleteMapping("")
+    @UserLoginToken
+    public JSONObject deleteAddress(@RequestHeader String token, @RequestParam String address_id){
+        String user_id = tokenService.getIdOrName(token);
+        return addressService.removeAddress(address_id, user_id);
+    }
 }

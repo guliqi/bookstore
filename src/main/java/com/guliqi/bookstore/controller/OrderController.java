@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/order")
+@RequestMapping(value = "/request/order")
 public class OrderController {
     private OrderService orderService;
     private TokenService tokenService;
@@ -35,5 +35,13 @@ public class OrderController {
     public JSONObject mockPay(@RequestHeader String token, @RequestBody Order order){
         String user_id = tokenService.getIdOrName(token);
         return orderService.mockPay(order, user_id);
+    }
+
+    @ApiOperation("测试查看订单")
+    @GetMapping(value = "")
+    @UserLoginToken
+    public JSONObject getOrder(@RequestHeader String token, @RequestParam String order_id){
+        String user_id = tokenService.getIdOrName(token);
+        return orderService.getOrder(order_id, user_id);
     }
 }

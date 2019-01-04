@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/store")
+@RequestMapping(value = "/request/store")
 public class StoreController {
     private StoreService storeService;
 
@@ -19,9 +19,9 @@ public class StoreController {
     }
 
     @ApiOperation(value = "测试打开商店")
-    @GetMapping(value = "/{store_id}")
+    @GetMapping(value = "")
     @JsonView(Views.WithUserView.class)
-    public JSONObject enterStore(@PathVariable String store_id){
+    public JSONObject enterStore(@RequestParam String store_id){
         return storeService.enterStore(store_id);
     }
 

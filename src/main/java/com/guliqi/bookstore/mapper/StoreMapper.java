@@ -32,8 +32,8 @@ public interface StoreMapper {
     })
     int insert(Store record);
 
-    // 返回 id, name, address
-    @Select({"select store_id, address_id, storename from Store where store_id = #{store_id,jdbcType=VARCHAR}"})
+    // 返回 id, name, address, introduction
+    @Select({"select store_id, address_id, storename, introduction from Store where store_id = #{store_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="store_id", property="store_id", jdbcType=JdbcType.VARCHAR, id=true),
             @Result(column="address_id", property="address", jdbcType=JdbcType.VARCHAR,

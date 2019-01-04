@@ -18,5 +18,5 @@ public class Constants {
     public final static String ORDER_UNPAID    = "UNPAID";
     public final static String ORDER_PAID      = "PAID";
     public final static String ORDER_DELIVERED = "DELIVERED";
-    public final static String ORDER_RECEIVED  = "RECEIVED";
+    public final static String ORDER_INACTIVE  = "INACTIVE";
 }

@@ -14,16 +14,13 @@ public interface AddressMapper {
     int deleteById(String address_id);
 
     @Update({
-        "update Address",
-        "set user_id = #{user_id,jdbcType=VARCHAR},",
-          "province = #{province,jdbcType=VARCHAR},",
-          "city = #{city,jdbcType=VARCHAR},",
-          "Line1 = #{line1,jdbcType=VARCHAR}",
-        "where address_id = #{address_id,jdbcType=VARCHAR}"
+            "update Address",
+            "set province = #{province,jdbcType=VARCHAR},",
+            "city = #{city,jdbcType=VARCHAR},",
+            "Line1 = #{line1,jdbcType=VARCHAR}",
+            "where address_id = #{address_id,jdbcType=VARCHAR}"
     })
     int updateById(Address record);
-
-
 
     @Insert({
             "insert into Address (address_id, user_id, province, city, Line1)",
@@ -41,15 +38,6 @@ public interface AddressMapper {
                             fetchType = FetchType.LAZY))
     })
     Address selectById(String address_id);
-
-//    @Select({"select * from Address where user_id = #{user_id,jdbcType=VARCHAR}"})
-//    @Results({
-//            @Result(column = "address_id", property = "address_id", jdbcType=JdbcType.VARCHAR, id = true),
-//            @Result(column = "user_id", property = "user", jdbcType=JdbcType.VARCHAR,
-//                    one = @One(select = "com.guliqi.bookstore.mapper.UserMapper.selectById",
-//                            fetchType = FetchType.EAGER))
-//    })
-//    Set<Address> selectByUserId(String user_id);
 
     @Select({"select * from Address where user_id = #{user_id,jdbcType=VARCHAR}"})
     @Results({

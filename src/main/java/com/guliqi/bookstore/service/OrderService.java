@@ -64,7 +64,7 @@ public class OrderService {
         Order o = orderMapper.selectById(order.getOrder_id());
 
         if (o == null || !o.getUser().getUser_id().equals(user_id))
-            jsonObject.put("message", "Order does not exists");
+            jsonObject.put("message", "order does not exists");
         else if (!o.getState().equals(Constants.ORDER_UNPAID))
             jsonObject.put("message", "already paid");
         else {
@@ -72,6 +72,26 @@ public class OrderService {
             if (orderMapper.updateById(order) < 1)
                 jsonObject.put("message", "update failed");
             else jsonObject.put("message", "success");
+        }
+        return jsonObject;
+    }
+
+    @Deprecated
+    public JSONObject getOrder(String order_id, String user_id){
+        JSONObject jsonObject = new JSONObject();
+        User user = userMapper.selectById(user_id);
+        boolean orderExists = false;
+        for (Order order : user.getOrderSet()){
+            if (order.getOrder_id().equals(order_id)){
+                orderExists = true;
+                break;
+            }
+        }
+        if (!orderExists)
+            jsonObject.put("message", "order does not exists");
+        else {
+            jsonObject.put("message", "success");
+            jsonObject.put("contents", orderMapper.selectById(order_id));
         }
         return jsonObject;
     }

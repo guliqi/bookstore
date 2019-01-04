@@ -24,7 +24,7 @@ public class Application implements Serializable {
     @JsonView(Views.WithoutUserView.class)
     private Address address;
     @JsonView(Views.WithoutUserView.class)
-    private String bank_card;
+    private String ether_address;
     @JsonView(Views.WithoutUserView.class)
     private String state;
     @JsonView(Views.WithoutUserView.class)
@@ -37,7 +37,7 @@ public class Application implements Serializable {
         this.user = builder.user;
         this.storename = builder.storename;
         this.address = builder.address;
-        this.bank_card = builder.bank_card;
+        this.ether_address = builder.ether_address;
         this.state = builder.state;
         this.introduction = builder.introduction;
         this.admin = builder.admin;
@@ -52,7 +52,7 @@ public class Application implements Serializable {
 
         private Address address;
 
-        private String bank_card;
+        private String ether_address;
 
         private String state;
 
@@ -76,8 +76,8 @@ public class Application implements Serializable {
             this.address = address;
             return this;
         }
-        public Builder bank_card(String bank_card){
-            this.bank_card = bank_card;
+        public Builder ether_address(String ether_address){
+            this.ether_address = ether_address;
             return this;
         }
         public Builder state(String state){

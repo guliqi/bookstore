@@ -31,6 +31,8 @@ public class User implements Serializable {
     private String idcard;
     @JsonView(Views.WithoutPasswordView.class)
     private String realname;
+    @JsonView(Views.WithoutPasswordView.class)
+    private String ether_address;
     @JsonIgnore
     private Set<Store> storeSet;
     @JsonIgnore
