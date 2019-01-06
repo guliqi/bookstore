@@ -7,6 +7,7 @@ import com.guliqi.bookstore.mapper.OrderMapper;
 import com.guliqi.bookstore.mapper.UserMapper;
 import com.guliqi.bookstore.model.*;
 import com.guliqi.bookstore.utils.CommonUtil;
+import com.sun.tools.corba.se.idl.constExpr.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,41 +58,82 @@ public class OrderService {
         return jsonObject;
     }
 
-    //简单模拟支付
-    public JSONObject mockPay(Order order, String user_id){
+    public JSONObject pay(String order_id, String user_id){
         JSONObject jsonObject = new JSONObject();
-
-        Order o = orderMapper.selectById(order.getOrder_id());
-
-        if (o == null || !o.getUser().getUser_id().equals(user_id))
+        Order order = orderMapper.selectById(order_id);
+        if (order == null || !order.getUser().getUser_id().equals(user_id))
             jsonObject.put("message", "order does not exists");
-        else if (!o.getState().equals(Constants.ORDER_UNPAID))
-            jsonObject.put("message", "already paid");
+        else if (!order.getState().equals(Constants.ORDER_UNPAID))
+            jsonObject.put("message", "wrong state");
         else {
             order.setState(Constants.ORDER_PAID);
-            if (orderMapper.updateById(order) < 1)
+            if (orderMapper.updateStateById(order) < 1)
                 jsonObject.put("message", "update failed");
             else jsonObject.put("message", "success");
         }
         return jsonObject;
     }
 
-    @Deprecated
-    public JSONObject getOrder(String order_id, String user_id){
+    public JSONObject deliver(String order_id, String user_id){
+        JSONObject jsonObject = new JSONObject();
+        Order order = orderMapper.selectById(order_id);
+        if (order == null)
+            jsonObject.put("message", "order does not exists");
+        else if (!order.getState().equals(Constants.ORDER_PAID))
+            jsonObject.put("message", "wrong state");
+        else {
+            Store store = order.getStore();
+            User user = userMapper.selectById(user_id);
+            boolean storeExists = false;
+            for (Store s : user.getStoreSet()){
+                if (s.equals(store)){
+                    storeExists = true;
+                    break;
+                }
+            }
+            if (!storeExists)
+                jsonObject.put("message", "store does not exists");
+            else {
+                order.setState(Constants.ORDER_DELIVERED);
+                if (orderMapper.updateStateById(order) < 1)
+                    jsonObject.put("message", "update failed");
+                else jsonObject.put("message", "success");
+            }
+        }
+        return jsonObject;
+    }
+
+    public JSONObject receive(String order_id, String user_id){
+        JSONObject jsonObject = new JSONObject();
+        Order order = orderMapper.selectById(order_id);
+        if (order == null || !order.getUser().getUser_id().equals(user_id))
+            jsonObject.put("message", "order does not exists");
+        else if (!order.getState().equals(Constants.ORDER_DELIVERED))
+            jsonObject.put("message", "wrong state");
+        else {
+            order.setState(Constants.ORDER_INACTIVE);
+            if (orderMapper.updateStateById(order) < 1)
+                jsonObject.put("message", "update failed");
+            else jsonObject.put("message", "success");
+        }
+        return jsonObject;
+    }
+
+    public JSONObject toBeShipped(String store_id, String user_id){
         JSONObject jsonObject = new JSONObject();
         User user = userMapper.selectById(user_id);
-        boolean orderExists = false;
-        for (Order order : user.getOrderSet()){
-            if (order.getOrder_id().equals(order_id)){
-                orderExists = true;
+        boolean storeExists = false;
+        for (Store store : user.getStoreSet()){
+            if (store.getStore_id().equals(store_id)){
+                storeExists = true;
                 break;
             }
         }
-        if (!orderExists)
-            jsonObject.put("message", "order does not exists");
+        if (!storeExists)
+            jsonObject.put("message", "store does not exists");
         else {
             jsonObject.put("message", "success");
-            jsonObject.put("contents", orderMapper.selectById(order_id));
+            jsonObject.put("contents", orderMapper.selectTobeShipped(store_id));
         }
         return jsonObject;
     }

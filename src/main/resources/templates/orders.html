@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap-theme.min.css}" href="../static/css/bootstrap-theme.min.css"
+          rel="stylesheet"/>
+    <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
+    <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
+    <script th:src="@{/js/order.js}" src="../static/js/order.js"></script>
+    <script th:src="@{/js/web3.min.js}" src="../static/js/web3.min.js"></script>
+    <script th:src="@{/js/ethereum.js}" src="../static/js/ethereum.js"></script>
+
+    <script type="text/javascript">
+        function init() {
+            // $('#cart').attr('href','/cart?user_id=' + $.getUrlParam('user_id'));
+            $('#cart').click(function () {
+                alert("Coming soon...");
+            });
+            $('#account').attr('href','/account?user_id=' + $.getUrlParam('user_id'));
+            getOrders();
+        }
+
+        function getOrders() {
+            var token = $.cookie('token');
+            if (token != null) {
+                $.get({
+                    headers: {
+                        "token": token
+                    },
+                    dataType: "json",
+                    url: "/user/orders",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result.message === "success") {
+                            var html = [];
+                            if (result.contents.length === 0){
+                                html.push("<div class='row' style='margin-top: 200px'>");
+                                html.push("<div class='col-md-4 col-md-offset-4'>");
+                                html.push("<span class='center-block' style='color: gray; font-size: larger; text-align: center'>You have no order recently</span>");
+                                html.push("</div></div>");
+                            }
+                            else {
+                                result.contents.sort(function sortByTime(a, b){
+                                    return new Date(b.create_time) - new Date(a.create_time)
+                                });
+                                $.each(result.contents, function () {
+                                    html.push("<div class='row'>");
+                                    if ($(this)[0].state === 'DELIVERED')
+                                        html.push("<div class='panel panel-success'>");
+                                    else if ($(this)[0].state === 'UNPAID')
+                                        html.push("<div class='panel panel-warning'>");
+                                    else if ($(this)[0].state === 'PAID')
+                                        html.push("<div class='panel panel-info'>");
+                                    else html.push("<div class='panel panel-default'>");
+                                    html.push("<div class='panel-heading'>");
+                                    var book = $(this)[0].book.bookname + ' (version ' + $(this)[0].book.version + '), ' + $(this)[0].book.press;
+                                    html.push("<a href='book?book_id=" + $(this)[0].book.book_id + "' class='panel-title'>" + book + "</a>");
+                                    html.push("</div>");
+                                    html.push("<div class='panel-body'>");
+                                    html.push("<div class='col-md-2 col-sm-2'>");
+                                    html.push("<img src='/icon/springboot.jpg' width='100%' height='auto'>");
+                                    html.push("</div>");
+                                    html.push("<div class='col-md-6 col-md-offset-1 col-sm-8'>");
+                                    html.push("<div>order id: " + "<span id='order_id'>" + $(this)[0].order_id + "</span></div>");
+                                    html.push("<div>transaction id: " + "<span id='tx_id'>" + $(this)[0].tx_id + "</span></div>");
+                                    html.push("<div>state: " + $(this)[0].state + "</div>");
+                                    html.push("<div>amount: " + $(this)[0].amount + "</div>");
+                                    html.push("<div>payment: " + "<span id='tx_id'>" + $(this)[0].payment + "</span>" + " ether</div>");
+                                    var address = $(this)[0].address.line1 + ', ' + $(this)[0].address.city + ', ' + $(this)[0].address.province;
+                                    html.push("<div>delivery address: " + address + "</div>");
+                                    html.push("<div>create time: " + new Date($(this)[0].create_time).toLocaleString() + "</div>");
+                                    html.push("</div>");
+                                    if ($(this)[0].state === 'DELIVERED')
+                                        html.push("<div class='col-md-1 col-md-offset-2 col-sm-2' style='margin-top: 10px' ><input type='button' id='receive' class='btn btn-success btn-block' value='receive'></div>");
+                                    else if ($(this)[0].state === 'UNPAID')
+                                        html.push("<div class='col-md-1 col-md-offset-2 col-sm-2' style='margin-top: 10px' ><input type='button' id='pay' class='btn btn-info btn-block' value='pay'></div>");
+                                    else if ($(this)[0].state === 'PAID')
+                                        html.push("<div class='col-md-1 col-md-offset-2 col-sm-2' style='margin-top: 10px' ><input type='button' class='btn btn-danger btn-block' value='abort'></div>");
+                                    else
+                                        html.push("<div class='col-md-1 col-md-offset-2 col-sm-2' style='margin-top: 10px' ><input type='button' class='btn btn-warning btn-block' value='score'></div>");
+                                    html.push("</div>");
+                                    html.push("</div>");
+                                    html.push("</div>");
+                                });
+                            }
+                            $('#orderContainer').html(html.join(''));
+                        }
+                    },
+                    error: function () {
+                        $.cookie('token', '', {expires: -1});
+                        window.location.href = "error";
+                    }
+                })
+            }
+            else {
+                window.location.href="login";
+            }
+        }
+
+        $(document).on("click","#receive",function(e){
+            var node = $(this).parents('div')[1].children[1].children;
+            $('#receive_order_id')[0].innerHTML = node[0].children[0].innerHTML;
+            $('#receive_tx_id')[0].innerHTML = node[1].children[0].innerHTML;
+            $('#receiveTitle').text('Make sure you have RECEIVE the book');
+            $('#receiveModal').modal('show');
+        });
+
+        $(document).on("click","#pay",function(e){
+            var node = $(this).parents('div')[1].children[1].children;
+            $('#pay_order_id')[0].innerHTML = node[0].children[0].innerHTML;
+            $('#pay_tx_id')[0].innerHTML = node[1].children[0].innerHTML;
+            $('#pay_payment')[0].innerHTML = node[4].children[0].innerHTML;
+            getEtherAddress(function (etherAddress) {
+                $('#balance')[0].innerHTML = web3.eth.getBalance(etherAddress) / Math.pow(10, 18);
+            });
+
+            $('#payTitle').text('Paying NOW or LATER');
+            $('#payModal').modal('show');
+        });
+
+        $(document).on("click","#score",function (e) {
+            alert('Coming soon...');
+        });
+
+        $(document).on("click","#abort",function (e) {
+            alert('Coming soon...');
+        });
+
+        $(document).ready(function(){
+            $('#receiveSureBtn').click(function () {
+                var receivedEvent = contract.Received();
+                receivedEvent.watch(function(error, result){
+                    if (!error)
+                    {
+                        receivedEvent.stopWatching();
+                        $('#receiveModal').modal('hide');
+                        receiveOrder($('#receive_order_id')[0].innerHTML, getOrders);
+                    } else {
+                        console.log(error);
+                    }
+                });
+                getEtherAddress(function (etherAddress) {
+                    receive(etherAddress, $('#receive_tx_id')[0].innerHTML);
+                });
+            });
+
+            $('#receiveCancelBtn').click(function () {
+                $('#receiveModal').modal('hide');
+            });
+
+            $('#paySureBtn').click(function () {
+                var paidEvent = contract.Paid();
+                paidEvent.watch(function(error, result){
+                    if (!error)
+                    {
+                        paidEvent.stopWatching();
+                        $('#payModal').modal("hide");
+                        payOrder($('#pay_order_id')[0].innerHTML, getOrders);
+                    } else {
+                        console.log(error);
+                    }
+                });
+                getEtherAddress(function (etherAddress) {
+                    pay(etherAddress, $('#pay_payment')[0].innerHTML * Math.pow(10, 18), $('#pay_tx_id')[0].innerHTML);
+                });
+            });
+
+            $('#laterBtn').click(function () {
+                $('#payModal').modal("hide");
+            });
+        });
+    </script>
+</head>
+<body onload="init()">
+<nav class="navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">etherStore  </span>
+                <small style="color: #5e5e5e">your online book store</small></a>
+        </div>
+
+        <ul class="nav navbar-nav">
+            <li><a href="index"><span class="glyphicon glyphicon-home"></span>Home</a></li>
+            <li><a href="#" id="account"><span class="glyphicon glyphicon-user"></span>Account</a></li>
+            <li><a href="#" id="cart"><span class="glyphicon glyphicon-shopping-cart"></span>Cart</a></li>
+            <li class="active"><a href="#" id="orders"><span class="glyphicon glyphicon-list-alt"></span>Orders</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container" id="orderContainer" style="margin-top: 100px">
+</div>
+
+<div class="modal fade" id="receiveModal" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true" style="top: 200px">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiveTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" hidden="hidden">
+                <span id="receive_tx_id"></span>
+                <span id="receive_order_id"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="receiveSureBtn">Confirm</button>
+                <button type="button" class="btn btn-danger" id="receiveCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="payModal" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true" style="top: 200px">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="payTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span hidden id="pay_tx_id"></span>
+                <span hidden id="pay_payment"></span>
+                <span hidden id="pay_order_id"></span>
+                <span>Balance: </span><span id="balance"></span><span> ether</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="paySureBtn">pay now</button>
+                <button type="button" class="btn btn-warning" id="laterBtn">later</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

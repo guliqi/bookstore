@@ -1,275 +1,192 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>test</title>
-    <link th:href="@{/css/bootstrap.css}" href="../static/css/bootstrap.css" rel="stylesheet"/>
-    <link th:href="@{/css/bootstrap-theme.css}" href="../static/css/bootstrap-theme.css"
-          rel="stylesheet"/>
-    <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
+    <title>Home</title>
+    <link th:href="@{/css/font-awesome.min.css}" href="../static/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link th:href="@{/css/bootstrap.min.css}" href="../static/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link th:href="@{/css/style.css}" href="../static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
     <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
-    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
     <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
-    <script th:src="@{/js/web3.min.js}" src="../static/js/web3.min.js"></script>
-</head>
-<body>
-<div class="container">
+    <script th:src="@{/js/skdslider.min.js}" src="../static/js/skdslider.min.js"></script>
+    <link th:href="@{/css/skdslider.css}" href="../static/css/skdslider.css" rel="stylesheet">
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#demo1').skdslider({'delay':5000, 'animationSpeed': 2000,'showNextPrev':true,'showPlayButton':true,'autoSlide':true,'animationType':'fading'});
 
-    <h1>Info Contract</h1>
-
-    <h2 id="info"></h2>
-
-    <label for="name" class="col-md-2 control-label">Name</label>
-    <input id="name" type="text">
-
-    <label for="name" class="col-md-2 control-label">Age</label>
-    <input id="age" type="text">
-
-    <button id="button">Update Info</button>
-
-    <script>
-        if (typeof web3 !== 'undefined') {
-            web3 = new Web3(web3.currentProvider);
-        } else {
-            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
-        }
-        web3.eth.defaultAccount = web3.eth.accounts[0];
-        var myContract = web3.eth.contract([
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_sellerAddr",
-                        "type": "address"
-                    },
-                    {
-                        "name": "_price",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "create",
-                "outputs": [],
-                "payable": false,
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_txId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "deliver",
-                "outputs": [],
-                "payable": false,
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "constant": true,
-                "inputs": [
-                    {
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "Transaction",
-                "outputs": [
-                    {
-                        "name": "txId",
-                        "type": "uint256"
-                    },
-                    {
-                        "name": "buyerAddr",
-                        "type": "address"
-                    },
-                    {
-                        "name": "sellerAddr",
-                        "type": "address"
-                    },
-                    {
-                        "name": "price",
-                        "type": "uint256"
-                    },
-                    {
-                        "name": "state",
-                        "type": "uint8"
-                    }
-                ],
-                "payable": false,
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_txId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "pay",
-                "outputs": [],
-                "payable": true,
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_txId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "receive",
-                "outputs": [],
-                "payable": true,
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_txId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "abort",
-                "outputs": [],
-                "payable": true,
-                "stateMutability": "payable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "name": "_sender",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "_message",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "_txId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "Created",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "name": "_sender",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "_message",
-                        "type": "string"
-                    }
-                ],
-                "name": "Paid",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "name": "_sender",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "_message",
-                        "type": "string"
-                    }
-                ],
-                "name": "Aborted",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "name": "_sender",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "_message",
-                        "type": "string"
-                    }
-                ],
-                "name": "Delivered",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "name": "_sender",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "_message",
-                        "type": "string"
-                    }
-                ],
-                "name": "Received",
-                "type": "event"
-            }
-        ]);
-        var contract = myContract.at('0x9ce774fca17f26a04e2947ed5547909a8115cc7b');
-        var events = [];
-        var createdEvent = contract.Created();
-        var paidEvent = contract.Paid();
-        var abortedEvent = contract.Aborted();
-        var deliveredEvent = contract.Delivered();
-        var receivedEvent = contract.Received();
-        events.push([createdEvent, paidEvent, abortedEvent, deliveredEvent, receivedEvent]);
-
-        $.each(events, function () {
-            $(this).watch(function(error, result) {
-                if (!error)
-                {
-                    console.log(result);
-                } else {
-                    console.log(error);
-                }
+            $('#responsive').change(function(){
+                $('#responsive_wrapper').width($(this).val());
             });
         });
 
-        contract.pay.sendTransaction({value:web3.toWei(1,'ether'), from: '0x365417A7C5A099f26844De40B568c0C28968A524'}, function (error, result) {
-            if (!error)
-                console.log(result);
-            else console.log(error);
-        });
+        function sendToken() {
+            var token = $.cookie('token');
+            if (token != null) {
+                $.post({
+                    headers: {
+                        "token": token
+                    },
+                    dataType: "json",
+                    url: "/user/token/pass",
+                    success: function (result) {
+                        if (result.message === "success"){
+                            $('#login')[0].style.display = "none";
+                            $('#logout')[0].style.display = "block";
+                            $('#account').attr('href','/account?user_id=' + result.user_id);
+                            // $('#cart').attr('href','/cart?user_id=' + result.user_id);
+                            $('#orders').attr('href','/orders?user_id=' + result.user_id);
+                        }
+                    },
+                    error: function () {
+                        $.cookie('token', '', {expires: -1});
+                        $('#logout')[0].style.display = "none";
+                        $('#login')[0].style.display = "block";
+                    }
+                })
+            }
+            else {
+                $('#logout')[0].style.display = "none";
+                $('#login')[0].style.display = "block";
+                $('#account').attr('href','login');
+                // $('#cart').attr('href','login');
+                $('#orders').attr('href','login');
+            }
+            $('#cart').click(function () {
+                alert('Coming soon...');
+            });
+        }
 
-        // contract.abort.sendTransaction({from: web3.eth.accounts[1]}, function (error, result) {
-        //     if (!error)
-        //         console.log(result);
-        //     else console.log(error);
-        // });
+        function bestSales() {
+            $.get({
+                url: "/request/book/bestSales",
+                success: function (result) {
+                    if (result.message === "success"){
+                        var i = 1;
+                        result.contents.sort(function sortBySales(a, b){
+                            return new Date(b.sales) - new Date(a.sales)
+                        });
+                        $.each(result.contents, function () {
+                            var html = [];
+                            html.push("<div><h6 style='font-size: 20px; color: #8a6d3b'>");
+                            html.push($(this)[0].bookname + "</h6>");
+                            html.push("<img src='/icon/springboot.jpg' width='100%' height='auto'>");
+                            html.push("<span hidden>" + $(this)[0].book_id + "</span>");
+                            html.push("<p style='font-size: 15px; color: #ac2925'>Price: ");
+                            html.push($(this)[0].price + " ether</p>");
+                            html.push("<p style='font-size: 15px; color: #3c763d'>Sales: ");
+                            html.push($(this)[0].sales + "</p>");
+                            html.push("</div>");
+                            $('#grid_' + i++).html(html.join(""));
+                        });
+                    }
+                },
+                error: function () {
+                }
+            });
+            sendToken();
+        }
+
+        function bookDetail(item) {
+            var book_id = item.children[0].children[2].innerHTML;
+            window.location.href = "book?book_id=" + book_id;
+        }
     </script>
+    <script>
+        $(document).ready(function(){
+            $(".dropdown").hover(
+                function() {
+                    $('.dropdown-menu', this).stop( true, true ).slideDown("fast");
+                    $(this).toggleClass('open');
+                },
+                function() {
+                    $('.dropdown-menu', this).stop( true, true ).slideUp("fast");
+                    $(this).toggleClass('open');
+                }
+            );
+        });
+    </script>
+    <style type="text/css">
+        input#search {
+            background-image: url(/icon/search.png);
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+        input#search:focus {
+            background-image: none;
+        }
+    </style>
 
+</head>
+<body onload="bestSales()">
+
+<nav class="navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">etherStore  </span>
+                <small style="color: #5e5e5e">your online book store</small></a>
+        </div>
+
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span>Home</a></li>
+            <li><a href="#" id="account"><span class="glyphicon glyphicon-user"></span>Account</a></li>
+            <li><a href="#" id="cart"><span class="glyphicon glyphicon-shopping-cart"></span>Cart</a></li>
+            <li><a href="#" id="orders"><span class="glyphicon glyphicon-list-alt"></span>Orders</a></li>
+        </ul>
+
+        <form class="navbar-form navbar-left">
+            <div class="form-group">
+                <input type="text" id="search" class="form-control"/>
+            </div>
+            <button type="button" class="btn btn-default">Search</button>
+        </form>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="login" id="login" style="display: none"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+                <a href="index" id="logout" style="display: none" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="w3-slider">
+    <ul id="demo1">
+        <li>
+            <img th:src="@{/icon/loginbg.jpg}"/>
+            <div class="slide-desc">
+                <h3>WELCOME TO ETHER STORE</h3>
+            </div>
+        </li>
+        <li>
+            <img th:src="@{/icon/ethereum.jpg}"/>
+            <div class="slide-desc">
+                <h3>PAY WITH ETHER PROTECTED BY SMART CONTRACT </h3>
+            </div>
+        </li>
+        <li>
+            <img th:src="@{/icon/program.jpg}"/>
+        </li>
+    </ul>
 </div>
+<section class="w3-about text-center">
+    <div class="container">
+        <h2 class="w3ls_head">Wel<span>come</span></h2>
+        <p class="para"><span>Ether Store</span> an online customer-to-customer book store. Safety guaranteed by smart contract on ethereum.</p>
+        <h2 class="w3ls_head" style="font-size: 20px">Best<span>Sales</span></h2>
+        <div class="col-md-4 w3l-abt-grid" onclick='bookDetail(this)' onmouseover="changeCursor(this)" id="grid_1">
+        </div>
+        <div class="col-md-4 w3l-abt-grid" onclick='bookDetail(this)' onmouseover="changeCursor(this)" id="grid_2">
+        </div>
+        <div class="col-md-4 w3l-abt-grid" onclick='bookDetail(this)' onmouseover="changeCursor(this)" id="grid_3">
+        </div>
+    </div>
+</section>
 
 </body>
 </html>

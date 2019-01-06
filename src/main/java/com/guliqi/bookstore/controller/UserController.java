@@ -68,14 +68,12 @@ public class UserController {
         return userService.getProfile(user_id);
     }
 
-    @ApiOperation(value = "测试检验token")
+    @ApiOperation(value = "测试获取用户id")
     @PostMapping(value = "/token/pass")
     @UserLoginToken
-    public JSONObject pass(@RequestHeader String token, HttpServletResponse response){
+    public JSONObject pass(@RequestHeader String token){
         JSONObject jsonObject = new JSONObject();
         String user_id = tokenService.getIdOrName(token);
-//        Cookie cookie = CookieUtil.getTokenCookie(Constants.LOCALHOST, "/", token);
-//        response.addCookie(cookie);
         jsonObject.put("message", "success");
         jsonObject.put("user_id", user_id);
         return jsonObject;
@@ -116,5 +114,21 @@ public class UserController {
     public JSONObject getStores(@RequestHeader String token){
         String user_id = tokenService.getIdOrName(token);
         return userService.getInformation(user_id, Constants.STORE);
+    }
+
+    @ApiOperation(value = "测试获取用户订单")
+    @GetMapping("/orders")
+    @UserLoginToken
+    public JSONObject getOrders(@RequestHeader String token){
+        String user_id = tokenService.getIdOrName(token);
+        return userService.getInformation(user_id, Constants.ORDER);
+    }
+
+    @ApiOperation(value = "测试是否为店家账户")
+    @GetMapping("/store_owner")
+    @UserLoginToken
+    public JSONObject isStoreOwner(@RequestHeader String token){
+        String user_id = tokenService.getIdOrName(token);
+        return userService.isStoreOwner(user_id);
     }
 }

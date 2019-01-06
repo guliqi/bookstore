@@ -17,7 +17,6 @@ public interface BookMapper {
     })
     int deleteById(String book_id);
 
-    //todo: 店家修改书籍信息
     @Update({
         "update Book",
         "set store_id = #{store_id,jdbcType=VARCHAR},",
@@ -57,10 +56,30 @@ public interface BookMapper {
     })
     Book selectById(String book_id);
 
+    // 返回book_id, bookname, version, press
+    @Select({"select book_id, bookname, version, press from Book where book_id = #{book_id,jdbcType=VARCHAR}"})
+    @Results({
+            @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true)
+    })
+    Book simpleSelectById(String book_id);
+
     // 返回一个店铺的 book_id, bookname, price, sales 集合
     @Select({"select book_id, bookname, price, sales from Book where store_id = #{store_id,jdbcType=VARCHAR}"})
     @Results({
-            @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true),
+            @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true)
     })
     Set<Book> selectByStoreId(String store_id);
+
+    // 返回销售量最高的三本书
+    @Select({"select book_id, bookname, price, sales from Book order by sales desc limit 3"})
+    @Results({
+            @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true)
+    })
+    Set<Book> selectBestSales();
+
+    @Select({"select book_id, bookname, price, sales from Book where locate(#{bookname,jdbcType=VARCHAR}, bookname)>0"})
+    @Results({
+            @Result(column="book_id", property="book_id", jdbcType=JdbcType.VARCHAR, id=true)
+    })
+    Set<Book> selectByFuzzyMatchName(String bookname);
 }

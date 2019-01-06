@@ -3,11 +3,15 @@ package com.guliqi.bookstore.service;
 import com.alibaba.fastjson.JSONObject;
 import com.guliqi.bookstore.Constants;
 import com.guliqi.bookstore.mapper.UserMapper;
+import com.guliqi.bookstore.model.Order;
+import com.guliqi.bookstore.model.Store;
 import com.guliqi.bookstore.model.User;
 import com.guliqi.bookstore.utils.CommonUtil;
 import com.guliqi.bookstore.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class UserService {
@@ -37,7 +41,7 @@ public class UserService {
         }
         return jsonObject;
     }
-    //todo: contents只需要返回id
+
     public JSONObject login(User user){
         JSONObject jsonObject = new JSONObject();
         user.setPassword(MD5Util.MD5Encode(user.getPassword()));
@@ -91,6 +95,22 @@ public class UserService {
             }
             default:break;
         }
+        return jsonObject;
+    }
+
+    public JSONObject isStoreOwner(String user_id){
+        JSONObject jsonObject = new JSONObject();
+        User user = userMapper.selectById(user_id);
+        boolean isOwner = false;
+        for (Store store : user.getStoreSet()){
+            if (store.getShopKeeper().getUser_id().equals(user_id)){
+                isOwner = true;
+                break;
+            }
+        }
+        if (isOwner)
+            jsonObject.put("message", "success");
+        else jsonObject.put("message", "not the owner");
         return jsonObject;
     }
 }

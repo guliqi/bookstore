@@ -1,16 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>oBook</title>
-    <link th:href="@{/css/bootstrap.min.css}" href="../static/css/bootstrap.min.css" rel="stylesheet"/>
-    <link th:href="@{/css/bootstrap-theme.min.css}" href="../static/css/bootstrap-theme.min.css"
-          rel="stylesheet"/>
-    <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
+    <title>Home</title>
+    <link th:href="@{/css/font-awesome.min.css}" href="../static/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link th:href="@{/css/bootstrap.min.css}" href="../static/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all" />
+    <link th:href="@{/css/style.css}" href="../static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
     <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
-    <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
     <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
+    <script th:src="@{/js/skdslider.min.js}" src="../static/js/skdslider.min.js"></script>
+    <link th:href="@{/css/skdslider.css}" href="../static/css/skdslider.css" rel="stylesheet">
     <script type="text/javascript">
+        $(document).ready(function(){
+            $('#demo1').skdslider({'delay':5000, 'animationSpeed': 2000,'showNextPrev':true,'showPlayButton':true,'autoSlide':true,'animationType':'fading'});
+
+            $('#responsive').change(function(){
+                $('#responsive_wrapper').width($(this).val());
+            });
+        });
+
         function sendToken() {
             var token = $.cookie('token');
             if (token != null) {
@@ -20,13 +34,12 @@
                     },
                     dataType: "json",
                     url: "/user/token/pass",
-                    contentType: "application/json; charset=utf-8",
                     success: function (result) {
                         if (result.message === "success"){
                             $('#login')[0].style.display = "none";
                             $('#logout')[0].style.display = "block";
                             $('#account').attr('href','/account?user_id=' + result.user_id);
-                            $('#cart').attr('href','/cart?user_id=' + result.user_id);
+                            // $('#cart').attr('href','/cart?user_id=' + result.user_id);
                             $('#orders').attr('href','/orders?user_id=' + result.user_id);
                         }
                     },
@@ -41,28 +54,74 @@
                 $('#logout')[0].style.display = "none";
                 $('#login')[0].style.display = "block";
                 $('#account').attr('href','login');
-                $('#cart').attr('href','login');
+                // $('#cart').attr('href','login');
                 $('#orders').attr('href','login');
             }
+            $('#cart').click(function () {
+                alert('Coming soon...');
+            });
+        }
+
+        function bestSales() {
+            $.get({
+                url: "/request/book/bestSales",
+                success: function (result) {
+                    if (result.message === "success"){
+                        var i = 1;
+                        result.contents.sort(function sortBySales(a, b){
+                            return new Date(b.sales) - new Date(a.sales)
+                        });
+                        $.each(result.contents, function () {
+                            var html = [];
+                            html.push("<div><h6 style='font-size: 20px; color: #8a6d3b'>");
+                            html.push($(this)[0].bookname + "</h6>");
+                            html.push("<img src='/icon/springboot.jpg' width='100%' height='auto'>");
+                            html.push("<span hidden>" + $(this)[0].book_id + "</span>");
+                            html.push("<p style='font-size: 15px; color: #ac2925'>Price: ");
+                            html.push($(this)[0].price + " ether</p>");
+                            html.push("<p style='font-size: 15px; color: #3c763d'>Sales: ");
+                            html.push($(this)[0].sales + "</p>");
+                            html.push("</div>");
+                            $('#grid_' + i++).html(html.join(""));
+                        });
+                    }
+                },
+                error: function () {
+                }
+            });
+            sendToken();
+        }
+
+        function searchByName() {
+            window.location.href = "search?bookname=" + $('#search').val().trim();
+        }
+
+        function bookDetail(item) {
+            var book_id = item.children[0].children[2].innerHTML;
+            window.location.href = "book?book_id=" + book_id;
         }
     </script>
-    <style type="text/css">
-        input#search {
-            background-image: url(/icon/search.png);
-            background-repeat: no-repeat;
-            background-size: contain;
-        }
-        input#search:focus {
-            background-image: none;
-        }
-    </style>
-
+    <script>
+        $(document).ready(function(){
+            $(".dropdown").hover(
+                function() {
+                    $('.dropdown-menu', this).stop( true, true ).slideDown("fast");
+                    $(this).toggleClass('open');
+                },
+                function() {
+                    $('.dropdown-menu', this).stop( true, true ).slideUp("fast");
+                    $(this).toggleClass('open');
+                }
+            );
+        });
+    </script>
 </head>
-<body onload="sendToken()">
-<nav class="navbar-inverse visible-lg visible-md visible-sm" role="navigation">
+<body onload="bestSales()">
+
+<nav class="navbar-inverse" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">oBook  </span>
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">etherStore  </span>
                 <small style="color: #5e5e5e">your online book store</small></a>
         </div>
 
@@ -77,7 +136,7 @@
             <div class="form-group">
                 <input type="text" id="search" class="form-control"/>
             </div>
-            <button type="button" class="btn btn-default">Search</button>
+            <button type="button" class="btn btn-default" onclick="searchByName()">Search</button>
         </form>
 
         <ul class="nav navbar-nav navbar-right">
@@ -86,142 +145,41 @@
                 <a href="index" id="logout" style="display: none" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a>
             </li>
         </ul>
-
     </div>
 </nav>
 
-<div class="container" style="margin-top: 30px">
-    <div class="row">
-        <span style="font-size: 30px;padding-left:33px;">
-            Trending
-        </span>
-        <div style="font-size: 30px" class="glyphicon glyphicon-fire"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-2 col-sm-2 hidden-xs hidden-sm" style="height: 400px;">
-        </div>
-        <div class="col-md-10 col-sm-10" style="padding-left: 10px;">
-            <div class="row">
-                <div class="col-md-6 hidden-xs hidden-sm" style="height:200px;width: 480px;">
-                    <a href="#"><img src="middle01.jpg" height="100%" width="100%"></a>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p style="color: gray">电炖锅</p></a>
-                    <p style="color: red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
+<div class="w3-slider">
+    <ul id="demo1">
+        <li>
+            <img th:src="@{/icon/loginbg.jpg}"/>
+            <div class="slide-desc">
+                <h3>WELCOME TO ETHER STORE</h3>
             </div>
-            <div class="row">
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
+        </li>
+        <li>
+            <img th:src="@{/icon/ethereum.jpg}"/>
+            <div class="slide-desc">
+                <h3>PAY WITH ETHER PROTECTED BY SMART CONTRACT </h3>
             </div>
-        </div>
-    </div>
+        </li>
+        <li>
+            <img th:src="@{/icon/program.jpg}"/>
+        </li>
+    </ul>
 </div>
+<section class="w3-about text-center">
+    <div class="container">
+        <h2 class="w3ls_head">Wel<span>come</span></h2>
+        <p class="para"><span>Ether Store</span> an online customer-to-customer book store. Safety guaranteed by smart contract on ethereum.</p>
+        <h2 class="w3ls_head" style="font-size: 20px">Best<span>Sales</span></h2>
+        <div class="col-md-4 w3l-abt-grid" onclick='bookDetail(this)' onmouseover="changeCursor(this)" id="grid_1">
+        </div>
+        <div class="col-md-4 w3l-abt-grid" onclick='bookDetail(this)' onmouseover="changeCursor(this)" id="grid_2">
+        </div>
+        <div class="col-md-4 w3l-abt-grid" onclick='bookDetail(this)' onmouseover="changeCursor(this)" id="grid_3">
+        </div>
+    </div>
+</section>
 
-<div class="container">
-    <div class="row">
-        <span id="" style="font-size: 30px;padding-left:33px;">
-            Discount
-        </span>
-        <div style="font-size: 30px" class="glyphicon glyphicon-fire"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-2 col-sm-2 hidden-xs hidden-sm" style="height: 400px;">
-        </div>
-        <div class="col-md-10 col-sm-10" style="padding-left: 10px;">
-            <div class="row">
-                <div class="col-md-6 hidden-xs hidden-sm" style="height:200px;width: 480px;">
-                    <a href="#"><img src="middle01.jpg" height="100%" width="100%"></a>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-                <div class="col-md-2 col-sm-4 col-xs-6" align="center">
-                    <a href="#"><img src="small03.jpg"></a>
-                    <a href="#"><p><font color="gray">电炖锅</p></a>
-                    <p><font color="red">￥399</font></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>

@@ -8,7 +8,7 @@
           rel="stylesheet"/>
     <link th:href="@{/css/bootstrap-table.min.css}" href="../static/css/bootstrap-table.min.css" rel="stylesheet">
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
-    <link rel="stylesheet" href="//at.alicdn.com/t/font_990690_11f0h51igp8f.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_990690_giadjzr36jl.css">
 
     <script th:src="@{/js/jquery-3.3.1.min.js}" src="../static/js/jquery-3.3.1.min.js"></script>
     <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
@@ -17,7 +17,51 @@
     <script th:src="@{/js/bootstrap-table-editable.min.js}" src="../static/js/bootstrap-table-editable.min.js"></script>
     <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
     <script type="text/javascript">
-
+        
+        function init() {
+            var token = $.cookie('token');
+            if (token !== null){
+                $.get({
+                    headers: {
+                        "token": token
+                    },
+                    dataType: "json",
+                    url: "/user/store_owner",
+                    success: function (result) {
+                        if (result.message === 'success'){
+                            $('#li_addBook')[0].innerHTML = "<a href=\"#\" id=\"addBook\"><span class=\"icon iconfont icon-book\"></span>Add book</a>";
+                            $('#li_storeOrders')[0].innerHTML = "<a href=\"#\" id=\"storeOrders\"><span class=\"icon iconfont icon-deliver_fill\"></span>Store orders</a>";
+                            $('#addBook').click(function () {
+                                $("#addBookTitle").text('Add a Book to Your Store');
+                                $('#addBookModal').modal('show');
+                            });
+                            $('#storeOrders').click(function () {
+                                window.location.href = "store_orders?store_id=" + $.getUrlParam('store_id');
+                            });
+                            $("#addBookSureBtn").click(function (){
+                                $("#addBookModal").modal("hide");
+                                var inputBookName = $("#input_book_name").val();
+                                var inputAuthor = $("#input_author").val();
+                                var inputBookIntroduction = $("#input_book_introduction").val();
+                                var inputStock = $("#input_stock").val();
+                                var inputPrice = $("#input_price").val();
+                                var inputVersion = $("#input_version").val();
+                                var inputPress = $("#input_press").val();
+                                addBook(inputBookName, inputStock, inputPrice, inputAuthor, inputVersion, inputPress, inputBookIntroduction);
+                            });
+                        }
+                        else {
+                        }
+                    },
+                    error: function () {
+                    }
+                });
+            } 
+            else {
+            }
+            enterStore();
+        }
+        
         function enterStore() {
             $.get({
                 data: {"store_id": $.getUrlParam('store_id')},
@@ -42,15 +86,15 @@
                             if (i % 4 === 0){
                                 html.push("<div class=\"row\">");
                             }
-                            html.push("<div class=\"col-md-3 col-sm-6\" onclick='bookDetail(this)'>");
-                            html.push("<div><h4>");
+                            html.push("<div class=\"col-md-3 col-sm-6\" onclick='bookDetail(this)' onmouseover='changeCursor(this)'>");
+                            html.push("<div><h6 style='font-size: 20px; color: #8a6d3b'>");
                             html.push($(this)[0].bookname);
-                            html.push("</h4>");
+                            html.push("</h6>");
                             html.push("<img src='/icon/springboot.jpg' width='100%' height='auto'>");
                             html.push("<span hidden>" + $(this)[0].book_id + "</span>");
-                            html.push("<p>Price: ");
+                            html.push("<p style='font-size: 15px; color: #ac2925'>Price: ");
                             html.push($(this)[0].price + " ether</p>");
-                            html.push("<p>Sales: ");
+                            html.push("<p style='font-size: 15px; color: #3c763d'>Sales: ");
                             html.push($(this)[0].sales + "</p>");
                             html.push("</div></div>");
                             if (i % 4 === 3 || i === len - 1){
@@ -121,35 +165,18 @@
             })
         });
 
-        $(document).ready(function() {
-            $('#addBook').click(function () {
-                $("#addBookTitle").text('Add a Book to Your Store');
-                $('#addBookModal').modal('show');
-            });
-            $("#addBookSureBtn").click(function (){
-                $("#addBookModal").modal("hide");
-                var inputBookName = $("#input_book_name").val();
-                var inputAuthor = $("#input_author").val();
-                var inputBookIntroduction = $("#input_book_introduction").val();
-                var inputStock = $("#input_stock").val();
-                var inputPrice = $("#input_price").val();
-                var inputVersion = $("#input_version").val();
-                var inputPress = $("#input_press").val();
-                addBook(inputBookName, inputStock, inputPrice, inputAuthor, inputVersion, inputPress, inputBookIntroduction);
-            });
-        });
-
     </script>
 
 </head>
-<body onload="enterStore()">
-<nav class="navbar-inverse visible-lg visible-md visible-sm" role="navigation">
+<body onload="init()">
+<nav class="navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">oBook  </span>
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">etherStore  </span>
                 <small style="color: #5e5e5e">your online book store</small></a>
         </div>
         <ul class="nav navbar-nav">
+            <li><a href="index"><span class="glyphicon glyphicon-home"></span>Home</a></li>
             <li class="dropdown">
                 <a href="#" data-toggle="dropdown"><span class="icon iconfont icon-store1"></span>Store profile</a>
                 <div class="dropdown-menu" style="width: max-content">
@@ -183,9 +210,8 @@
                     </div>
                 </div>
             </li>
-            <li>
-                <a href="#" id="addBook"><span class="icon iconfont icon-book"></span>Add book</a>
-            </li>
+            <li id="li_addBook"></li>
+            <li id="li_storeOrders"></li>
         </ul>
     </div>
 </nav>
@@ -204,7 +230,7 @@
             <div class="modal-body">
                 <form>
                     <div class="form-group">
-                        <label for="input_book_name" class="col-form-label">Book name</label>
+                        <label for="input_book_name" class="col-form-label ">Book name</label>
                         <input type="text" autofocus class="form-control" id="input_book_name">
                     </div>
                     <div class="form-group">

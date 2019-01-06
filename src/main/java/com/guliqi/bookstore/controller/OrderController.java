@@ -30,18 +30,34 @@ public class OrderController {
     }
 
     @ApiOperation("测试订单支付")
-    @PutMapping(value = "")
+    @PutMapping(value = "/pay")
     @UserLoginToken
-    public JSONObject mockPay(@RequestHeader String token, @RequestBody Order order){
+    public JSONObject pay(@RequestHeader String token, @RequestParam String order_id){
         String user_id = tokenService.getIdOrName(token);
-        return orderService.mockPay(order, user_id);
+        return orderService.pay(order_id, user_id);
     }
 
-    @ApiOperation("测试查看订单")
-    @GetMapping(value = "")
+    @ApiOperation("测试查看未发货订单")
+    @GetMapping(value = "/toBeShipped")
     @UserLoginToken
-    public JSONObject getOrder(@RequestHeader String token, @RequestParam String order_id){
+    public JSONObject toBeShipped(@RequestHeader String token, @RequestParam String store_id){
         String user_id = tokenService.getIdOrName(token);
-        return orderService.getOrder(order_id, user_id);
+        return orderService.toBeShipped(store_id, user_id);
+    }
+
+    @ApiOperation("测试确认发货")
+    @PutMapping(value = "/deliver")
+    @UserLoginToken
+    public JSONObject deliver(@RequestHeader String token, @RequestParam String order_id){
+        String user_id = tokenService.getIdOrName(token);
+        return orderService.deliver(order_id, user_id);
+    }
+
+    @ApiOperation("测试确认收货")
+    @PutMapping(value = "/receive")
+    @UserLoginToken
+    public JSONObject receive(@RequestHeader String token, @RequestParam String order_id){
+        String user_id = tokenService.getIdOrName(token);
+        return orderService.receive(order_id, user_id);
     }
 }

@@ -34,4 +34,16 @@ public class BookController {
     public JSONObject bookDetail(@RequestParam String book_id){
         return bookService.bookDetail(book_id);
     }
+
+    @ApiOperation(value = "测试按书名搜索")
+    @GetMapping(value = "/search")
+    public JSONObject searchByName(@RequestParam String bookname){
+        return bookService.searchByName(bookname);
+    }
+
+    @ApiOperation(value = "测试搜索销量最高图书")
+    @GetMapping(value = "/bestSales")
+    public JSONObject bestSales(){
+        return bookService.bestSales();
+    }
 }

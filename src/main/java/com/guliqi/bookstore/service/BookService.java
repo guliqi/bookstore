@@ -52,4 +52,20 @@ public class BookService {
         else jsonObject.put("message", "book does not exists");
         return jsonObject;
     }
+
+    public JSONObject searchByName(String bookname){
+        JSONObject jsonObject = new JSONObject();
+        Set<Book> books = bookMapper.selectByFuzzyMatchName(bookname);
+        jsonObject.put("message", "success");
+        jsonObject.put("contents", books);
+        return jsonObject;
+    }
+
+    public JSONObject bestSales(){
+        JSONObject jsonObject = new JSONObject();
+        Set<Book> books = bookMapper.selectBestSales();
+        jsonObject.put("message", "success");
+        jsonObject.put("contents", books);
+        return jsonObject;
+    }
 }

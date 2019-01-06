@@ -39,6 +39,13 @@ public interface AddressMapper {
     })
     Address selectById(String address_id);
 
+    // 返回province, city, line1
+    @Select({"select province, city, line1 from Address where address_id = #{address_id,jdbcType=VARCHAR}"})
+    @Results({
+            @Result(column = "address_id", property = "address_id", jdbcType=JdbcType.VARCHAR, id = true),
+    })
+    Address simpleSelectById(String address_id);
+
     @Select({"select * from Address where user_id = #{user_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column = "address_id", property = "address_id", jdbcType=JdbcType.VARCHAR, id = true),

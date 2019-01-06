@@ -250,7 +250,7 @@ var contract = myContract.at('0x9ce774fca17f26a04e2947ed5547909a8115cc7b');
 //     }
 // });
 
-function create(from, seller_address, price, callback) {
+function create(from, seller_address, price) {
     contract.create.sendTransaction(seller_address, price, {from: from, gas: 3000000}, function (error, result) {
         if (!error) console.log(result);
         else alert(error);
@@ -272,14 +272,14 @@ function abort(from, tx_id) {
 }
 
 function deliver(from, tx_id) {
-    contract.abort.sendTransaction(tx_id, {from: from}, function (error, result) {
+    contract.deliver.sendTransaction(tx_id, {from: from}, function (error, result) {
         if (!error) console.log(result);
         else console.log(error);
     })
 }
 
 function receive(from, tx_id) {
-    contract.abort.sendTransaction(tx_id, {from: from}, function (error, result) {
+    contract.receive.sendTransaction(tx_id, {from: from}, function (error, result) {
         if (!error) console.log(result);
         else console.log(error);
     })

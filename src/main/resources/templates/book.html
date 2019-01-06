@@ -13,6 +13,7 @@
     <script th:src="@{/js/jquery.cookie.js}" src="../static/js/jquery.cookie.js"></script>
     <script th:src="@{/js/bootstrap.min.js}" src="../static/js/bootstrap.min.js"></script>
     <script th:src="@{/js/obook.js}" src="../static/js/obook.js"></script>
+    <script th:src="@{/js/order.js}" src="../static/js/order.js"></script>
     <script th:src="@{/js/address.js}" src="../static/js/address.js"></script>
     <script th:src="@{/js/web3.min.js}" src="../static/js/web3.min.js"></script>
     <script th:src="@{/js/ethereum.js}" src="../static/js/ethereum.js"></script>
@@ -21,6 +22,8 @@
 
         var addressIdArray = [];
         var store_id = "error";
+        var order_id, tx_id;
+
         function bootDetail() {
             $.get({
                 data: {"book_id": $.getUrlParam('book_id')},
@@ -53,35 +56,9 @@
                     }
                 },
                 error: function () {
-                    
+
                 }
             });
-        }
-
-        function getEtherAddress() {
-            var token = $.cookie('token');
-            if (token != null) {
-                $.get({
-                    headers: {
-                        "token": token
-                    },
-                    dataType: "json",
-                    url: "/user/profile",
-                    contentType: "application/json; charset=utf-8",
-                    success: function (result) {
-                        if (result.message === "success"){
-                            $('#ether_from').attr('value', result.contents.ether_address);
-                        }
-                    },
-                    error: function () {
-                        $.cookie('token', '', {expires: -1});
-                        window.location.href="error";
-                    }
-                })
-            }
-            else {
-                window.location.href="login";
-            }
         }
 
         function sendToken(){
@@ -114,52 +91,6 @@
             }
         }
 
-        function purchase(address_id, amount, comments, tx_id){
-            var token = $.cookie('token');
-            var postdata = {
-                "book": {
-                    "book_id": $.getUrlParam('book_id')
-                },
-                "address": {
-                    "address_id": address_id
-                },
-                "amount": amount,
-                "comments": comments,
-                "tx_id": tx_id
-            };
-
-            if (token != null) {
-                $.post({
-                    headers: {
-                        "token": token
-                    },
-                    data: JSON.stringify(postdata),
-                    dataType: "json",
-                    url: "/request/order",
-                    contentType: "application/json; charset=utf-8",
-                    success: function (result) {
-                        if (result.message !== "success"){
-                            alert(result.message);
-                        }
-                        else {
-                            $('#balance')[0].innerHTML = web3.eth.getBalance($('#ether_from').val()) / Math.pow(10, 18);
-                        }
-                    },
-                    error: function () {
-                        $.cookie('token', '', {expires: -1});
-                        window.location.href = "error";
-                    }
-                });
-            }
-            else {
-                window.location.href = "login";
-            }
-        }
-
-        function pay(){
-
-        }
-
         $(function () {
             $(".dropdown").mouseover(function () {
                 $(this).addClass("open");
@@ -179,47 +110,76 @@
         });
 
         $(document).ready(function(){
-           $('#purchase').click(function () {
-               getAddress(false, $('#input_receiving_address'));
-               getEtherAddress();
-               $("#purchaseTitle").text('Fill with the information about your purchase. ' +
-                   'Pay attention to adding address beforehand for the sake of receiving address.');
-               $('#purchaseModal').modal('show');
-               $('#ether_to').attr('value', $('#ether_address')[0].innerHTML);
-               $('#total_price').attr('value', $('#input_amount').val() * $('#price')[0].innerHTML)
-           });
+            $('#purchase').click(function () {
+                getAddress(false, $('#input_receiving_address'));
+                getEtherAddress(function (etherAddress) {
+                    $('#ether_from').attr('value', etherAddress);
+                });
+                $("#purchaseTitle").text('Fill with the information about your purchase. ' +
+                    'Pay attention to adding address beforehand for the sake of receiving address.');
+                $('#purchaseModal').modal('show');
+                $('#ether_to').attr('value', $('#ether_address')[0].innerHTML);
+                $('#total_price').attr('value', $('#input_amount').val() * $('#price')[0].innerHTML)
+            });
 
-           $('#purchaseSureBtn').click(function () {
-               $(this).attr("disabled","disabled");
-               var createdEvent = contract.Created();
-               createdEvent.watch(function(error, result){
-                   if (!error)
-                   {
-                       purchase(inputAddressId, inputAmount, inputComments, result.args._txId);
-                       createdEvent.stopWatching();
-                       $("#payTitle").text('Paying NOW or LATER');
-                       $('#payModal').modal('show');
-                   } else {
-                       console.log(error);
-                   }
-               });
-               var inputAmount = $('#input_amount').val();
-               var inputAddressId = addressIdArray[$('#input_receiving_address').val()];
-               var inputComments = $('#input_comments').val();
-               create($('#ether_from').val(), $('#ether_to').val(), $('#total_price').val() * Math.pow(10, 18));
-           });
+            $('#purchaseSureBtn').click(function () {
+                $(this).attr("disabled","disabled");
+                var createdEvent = contract.Created();
+                createdEvent.watch(function(error, result){
+                    if (!error)
+                    {
+                        createdEvent.stopWatching();
+                        tx_id = result.args._txId;
+                        createOrder(inputAddressId, inputAmount, inputComments, tx_id, function (_order_id) {
+                            order_id = _order_id;
+                            $('#balance')[0].innerHTML = web3.eth.getBalance($('#ether_from').val()) / Math.pow(10, 18);
+                        });
+                        $("#payTitle").text('Paying NOW or LATER');
+                        $('#payModal').modal('show');
+                    } else {
+                        console.log(error);
+                    }
+                });
+                var inputAmount = $('#input_amount').val();
+                var inputAddressId = addressIdArray[$('#input_receiving_address').val()];
+                var inputComments = $('#input_comments').val();
+                create($('#ether_from').val(), $('#ether_to').val(), $('#total_price').val() * Math.pow(10, 18));
+            });
+
+            $('#paySureBtn').click(function () {
+                var paidEvent = contract.Paid();
+                paidEvent.watch(function(error, result){
+                    if (!error)
+                    {
+                        paidEvent.stopWatching();
+                        payOrder(order_id, function () {
+                        });
+                        $('#payModal').modal("hide");
+                        $('#purchaseModal').modal("hide");
+                    } else {
+                        console.log(error);
+                    }
+                });
+                pay($('#ether_from').val(), $('#total_price').val() * Math.pow(10, 18), tx_id);
+            });
+
+            $('#laterBtn').click(function () {
+                $('#payModal').modal("hide");
+                $('#purchaseModal').modal("hide");
+            })
         });
     </script>
 
 </head>
 <body onload="sendToken()">
-<nav class="navbar-inverse visible-lg visible-md visible-sm" role="navigation">
+<nav class="navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">oBook  </span>
+            <a class="navbar-brand" style="color: #ffffff" href="#"><span style="font-size: larger">etherStore  </span>
                 <small style="color: #5e5e5e">your online book store</small></a>
         </div>
         <ul class="nav navbar-nav">
+            <li><a href="index"><span class="glyphicon glyphicon-home"></span>Home</a></li>
             <li class="dropdown">
                 <a href="#" data-toggle="dropdown" id="store"><span class="icon iconfont icon-store1"></span>
                     <span id="title">Unknown</span></a>

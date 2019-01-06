@@ -37,9 +37,19 @@ public class WebController {
         return "book";
     }
 
-    @GetMapping(value = "/order")
-    public String pay(@RequestParam String order_id){
-        return "order";
+    @GetMapping(value = "/orders")
+    public String orders(@RequestParam String user_id){
+        return "orders";
+    }
+
+    @GetMapping(value = "/store_orders")
+    public String storeOrders(@RequestParam String store_id){
+        return "storeOrders";
+    }
+
+    @GetMapping(value = "/search")
+    public String search(@RequestParam String bookname){
+        return "search";
     }
 
     @GetMapping(value = "/test")

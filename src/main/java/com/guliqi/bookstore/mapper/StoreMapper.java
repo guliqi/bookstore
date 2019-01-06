@@ -42,6 +42,13 @@ public interface StoreMapper {
     })
     Store simpleSelectById(String store_id);
 
+    // 返回 id, name
+    @Select({"select store_id, storename from Store where store_id = #{store_id,jdbcType=VARCHAR}"})
+    @Results({
+            @Result(column="store_id", property="store_id", jdbcType=JdbcType.VARCHAR, id=true),
+    })
+    Store selectNameById(String store_id);
+
     @Select({"select * from Store where store_id = #{store_id,jdbcType=VARCHAR}"})
     @Results({
             @Result(column="store_id", property="store_id", jdbcType=JdbcType.VARCHAR, id=true),
