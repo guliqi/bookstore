@@ -52,8 +52,13 @@ public class WebController {
         return "search";
     }
 
-    @GetMapping(value = "/test")
-    public String test(){
-        return "test";
+    @GetMapping(value = "/admin")
+    public String admin(){
+        return "admin";
+    }
+
+    @GetMapping(value = "/application")
+    public String application(){
+        return "application";
     }
 }
