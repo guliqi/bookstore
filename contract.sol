@@ -51,7 +51,7 @@ contract Productsales {
 	function create(address _sellerAddr, uint _price)
 		public
 	{
-	    uint _txId = autoInc++; // cause dirty read?
+	    uint _txId = autoInc++;
 		Transaction[_txId].txId = _txId; 
 		Transaction[_txId].buyerAddr = msg.sender;
 		Transaction[_txId].sellerAddr = _sellerAddr;
@@ -112,6 +112,6 @@ contract Productsales {
 	{
 		emit Received(msg.sender, "received successfully");
 		Transaction[_txId].state = State.Inactive;
-		Transaction[_txId].sellerAddr.transfer(address(this).balance);
+		Transaction[_txId].sellerAddr.transfer(Transaction[_txId].price);
 	}
 }

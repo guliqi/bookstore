@@ -134,6 +134,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $('#apply').click(function () {
+                $("#input_ether_address").attr('value', $('#ether_address').val());
                 getAddress(false, $('#input_store_address'));
                 $("#applyTitle").text('Fill with the information about your application. ' +
                     'Pay attention to adding address beforehand for the sake of store address.');
@@ -148,6 +149,7 @@
                 applyForStore(inputStoreName, inputAddressId, inputEtherAddress, inputStoreIntroduction);
             });
             $('#check').click(function () {
+                $('#applicationTable').bootstrapTable('destroy');
                 getApplication();
                 $("#checkTitle").text('Application view');
                 $('#checkModal').modal('show');
@@ -495,7 +497,7 @@
 
                     <div class="form-group">
                         <label for="input_ether_address" class="col-form-label">Ether address</label>
-                        <input type="text" autofocus class="form-control" id="input_ether_address">
+                        <input type="text" readonly class="form-control" id="input_ether_address">
                     </div>
                     <div class="form-group">
                         <label for="input_store_introduction" class="col-form-label">Store introduction</label>

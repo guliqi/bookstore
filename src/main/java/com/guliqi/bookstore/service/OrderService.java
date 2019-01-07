@@ -7,7 +7,6 @@ import com.guliqi.bookstore.mapper.OrderMapper;
 import com.guliqi.bookstore.mapper.UserMapper;
 import com.guliqi.bookstore.model.*;
 import com.guliqi.bookstore.utils.CommonUtil;
-import com.sun.tools.corba.se.idl.constExpr.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

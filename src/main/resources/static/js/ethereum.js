@@ -10,20 +10,6 @@ var myContract = web3.eth.contract([
         "constant": false,
         "inputs": [
             {
-                "name": "_txId",
-                "type": "uint256"
-            }
-        ],
-        "name": "abort",
-        "outputs": [],
-        "payable": true,
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
                 "name": "_sellerAddr",
                 "type": "address"
             },
@@ -53,6 +39,41 @@ var myContract = web3.eth.contract([
         "type": "function"
     },
     {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "Transaction",
+        "outputs": [
+            {
+                "name": "txId",
+                "type": "uint256"
+            },
+            {
+                "name": "buyerAddr",
+                "type": "address"
+            },
+            {
+                "name": "sellerAddr",
+                "type": "address"
+            },
+            {
+                "name": "price",
+                "type": "uint256"
+            },
+            {
+                "name": "state",
+                "type": "uint8"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "constant": false,
         "inputs": [
             {
@@ -75,6 +96,20 @@ var myContract = web3.eth.contract([
             }
         ],
         "name": "receive",
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_txId",
+                "type": "uint256"
+            }
+        ],
+        "name": "abort",
         "outputs": [],
         "payable": true,
         "stateMutability": "payable",
@@ -169,41 +204,6 @@ var myContract = web3.eth.contract([
         ],
         "name": "Received",
         "type": "event"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "Transaction",
-        "outputs": [
-            {
-                "name": "txId",
-                "type": "uint256"
-            },
-            {
-                "name": "buyerAddr",
-                "type": "address"
-            },
-            {
-                "name": "sellerAddr",
-                "type": "address"
-            },
-            {
-                "name": "price",
-                "type": "uint256"
-            },
-            {
-                "name": "state",
-                "type": "uint8"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
     }
 ]);
 var contract = myContract.at('0x9ce774fca17f26a04e2947ed5547909a8115cc7b');
